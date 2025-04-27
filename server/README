@@ -1,0 +1,15 @@
+# to activate/deactivate conda environment
+conda activate ./fife_lab_env
+conda deactivate
+
+# To run:
+gunicorn main:app -b 127.0.0.1:5000 --log-level debug
+
+# To create environment file
+conda env export > environment_${macos | windows}.yml
+
+# to reconstitute from environment file 
+conda env create -f environment_${macos | windows}.yml -p fife_lab_env
+
+# to run server:
+python run_server.py
