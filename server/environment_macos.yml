@@ -32,6 +32,7 @@ dependencies:
   - typing_extensions=4.12.2=py313hca03da5_0
   - tzdata=2025a=h04d1e81_0
   - uvicorn=0.32.1=py313hca03da5_0
+  - websockets=10.4=py313h80987f9_2
   - wheel=0.45.1=py313hca03da5_0
   - xz=5.6.4=h80987f9_1
   - zlib=1.2.13=h18a0788_1

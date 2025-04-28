@@ -14,6 +14,8 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 app = FastAPI()
 
+is_keep_alive_worker = False;
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -25,7 +27,10 @@ app.add_middleware(
 first_ws_seen = asyncio.Event()
 
 def stdout_print(message: str) -> None:
-    logger.info(f"worker pid: {os.getpid()} - {message}")
+    if is_keep_alive_worker:
+        logger.info(f"worker pid: {os.getpid()}, KeepAlive - {message}")
+    else:
+        logger.info(f"worker pid: {os.getpid()} - {message}")
 
 @app.on_event("startup")
 async def start_watchdog() -> None:
@@ -67,14 +72,11 @@ async def websocket_endpoint(websocket: WebSocket):
     client = websocket.client
     stdout_print(f"WebSocket connected: {client}")
     stdout_print(f"WebSocket connection pid: {os.getpid}")
+    is_keep_alive_worker = True
 
     try:
         while True:
             data = await websocket.receive_text()
-            # this is to test what happens if this worker crashes
-            if data == "kill":
-                stdout_print("recieved kill signal. killing socket worker")
-                os._exit(1)
             stdout_print(f"Received: {data}")
             await websocket.send_text(f"Message text was: {data}")
     except WebSocketDisconnect as e:
