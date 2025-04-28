@@ -1,9 +1,24 @@
 import 'package:fife_lab/lib/app_logger.dart';
+import 'package:fife_lab/lib/server_process.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await AppLogger.init();
+
+  final docs = await getApplicationDocumentsDirectory();
+  final logPath = docs.path;
+  AppLogger.init(
+    logPath: logPath,
+    latestFileName: 'app_latest.log',
+  );
+
+  final serverProcess = ServerProcess(
+    logPath: logPath,
+    latestFileName: 'server_latest.log',
+  );
+  await serverProcess.spawn();
+  await serverProcess.startServer();
   runApp(const MyApp());
 }
 

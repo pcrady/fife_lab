@@ -1,27 +1,39 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
+import 'package:fife_lab/lib/app_logger.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as path;
 import 'dart:convert';
 
+class ServerProcessArgs {
+  final File serverExecutable;
+  final List<String> serverArgs;
+  final String latestFileName;
+  final String logPath;
 
-class SubprocessArgs {
-  File serverExecutable;
-  List<String> serverArgs;
-
-  SubprocessArgs({
+  ServerProcessArgs({
     required this.serverExecutable,
     required this.serverArgs,
+    required this.latestFileName,
+    required this.logPath,
   });
 }
 
-class Worker {
+class ServerProcess {
+  final String latestFileName;
+  final String logPath;
+
+  ServerProcess({
+    required this.latestFileName,
+    required this.logPath,
+  });
+
   late SendPort _mainSendPort;
   final Completer<void> _isolateReady = Completer.sync();
   bool serverStarted = false;
 
-  SubprocessArgs _getSubprocessArgs() {
+  ServerProcessArgs _getSubprocessArgs() {
     final flutterExecutable = File(Platform.resolvedExecutable);
     late String runServerExecPath;
     late Directory projectDir;
@@ -29,28 +41,35 @@ class Worker {
 
     if (kDebugMode || kProfileMode) {
       projectDir = flutterExecutable.parent.parent.parent.parent.parent.parent.parent.parent.parent;
-      relativePythonPath = 'server/test_env/bin/python';
+      relativePythonPath = 'server/fife_lab_env/bin/python';
       runServerExecPath = path.join(projectDir.path, 'server/run_server.py');
     } else {
       projectDir = flutterExecutable.parent.parent;
-      relativePythonPath = 'Resources/server/test_env/bin/python';
+      relativePythonPath = 'Resources/server/fife_lab_env/bin/python';
       runServerExecPath = path.join(projectDir.path, 'Resources/server/run_server.py');
     }
 
-    final args = SubprocessArgs(
+    final args = ServerProcessArgs(
       serverExecutable: File(path.join(projectDir.path, relativePythonPath)),
       serverArgs: [runServerExecPath],
+      logPath: logPath,
+      latestFileName: latestFileName,
     );
 
     return args;
   }
 
-  static void _isolate(SendPort port) {
+  static void _isolate(SendPort port) async {
     final isolateReceivePort = ReceivePort();
     port.send(isolateReceivePort.sendPort);
 
     isolateReceivePort.listen((dynamic args) async {
-      if (args is SubprocessArgs) {
+      if (args is ServerProcessArgs) {
+        AppLogger.init(
+          logPath: args.logPath,
+          latestFileName: args.latestFileName,
+        );
+
         int retries = 0;
         const maxRetries = 10;
         const retryDelay = Duration(milliseconds: 500);
@@ -67,7 +86,7 @@ class Worker {
             data = data.replaceAll('main pid:', '\nmain pid:');
             data = data.replaceAll('worker pid:', '\nworker pid:');
 
-            print(data);
+            AppLogger.w(data);
             if (data.contains('Address already in use')) {
               addressInUse = true;
             }
@@ -78,7 +97,7 @@ class Worker {
             data = data.replaceAll('main pid:', '\nmain pid:');
             data = data.replaceAll('worker pid:', '\nworker pid:');
 
-            print(data);
+            AppLogger.w(data);
             if (data.contains('Address already in use')) {
               addressInUse = true;
             }
@@ -91,7 +110,7 @@ class Worker {
             break;
           } else {
             retries += 1;
-            print('Retrying server start... attempt $retries');
+            AppLogger.w('Retrying server start... attempt $retries');
             await Future.delayed(retryDelay);
           }
         }
@@ -110,7 +129,7 @@ class Worker {
     } else if (message is bool) {
       serverStarted = message;
     } else {
-      print(message);
+      AppLogger.i(message);
     }
   }
 

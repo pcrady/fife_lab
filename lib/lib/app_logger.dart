@@ -1,27 +1,29 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
-import 'package:path_provider/path_provider.dart';
 
 class AppLogger {
   AppLogger._();
   static late final Logger _logger;
   static final Completer _completer = Completer();
 
-  static Future<void> init() async {
+  static void init({
+    required String latestFileName,
+    required String logPath,
+  }) {
     if (_completer.isCompleted) return;
-    final docs = await getApplicationDocumentsDirectory();
-    final logPath = docs.path;
-
     _logger = Logger(
       level: kReleaseMode ? Level.warning : Level.trace,
       output: MultiOutput([
         ConsoleOutput(),
-        AdvancedFileOutput(path: logPath),
+        AdvancedFileOutput(
+          path: logPath,
+          latestFileName: latestFileName,
+        ),
       ]),
     );
 
-    _logger.i('Logging to: $logPath');
+    _logger.i('Logging to: ${logPath}/${latestFileName}');
     _completer.complete();
   }
 
@@ -30,6 +32,8 @@ class AppLogger {
       throw StateError('AppLogger not initialized – call AppLogger.init() first.');
     }
   }
+
+  // TODO make a command for the server that prints in a different color
 
   static void d(
     dynamic message, {
