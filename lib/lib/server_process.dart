@@ -32,7 +32,6 @@ class ServerProcess {
 
   late SendPort _mainSendPort;
   final Completer<void> _isolateReady = Completer.sync();
-  bool serverStarted = false;
 
   ServerProcessArgs _getSubprocessArgs() {
     final flutterExecutable = File(Platform.resolvedExecutable);
@@ -50,8 +49,11 @@ class ServerProcess {
       runServerExecPath = path.join(projectDir.path, 'Resources/server/run_server.py');
     }
 
+    final serverExecutable = File(path.join(projectDir.path, relativePythonPath));
+    assert(serverExecutable.existsSync());
+
     final args = ServerProcessArgs(
-      serverExecutable: File(path.join(projectDir.path, relativePythonPath)),
+      serverExecutable: serverExecutable,
       serverArgs: [runServerExecPath],
       logPath: logPath,
       latestFileName: latestFileName,
@@ -105,7 +107,6 @@ class ServerProcess {
 
           final exitCode = await process.exitCode;
           if (!addressInUse) {
-            port.send(true);
             port.send(exitCode);
             break;
           } else {
@@ -121,8 +122,6 @@ class ServerProcess {
     if (message is SendPort) {
       _mainSendPort = message;
       _isolateReady.complete();
-    } else if (message is bool) {
-      serverStarted = message;
     } else if (message is int) {
       AppLogger.f('Exit Code: $message \nRestarting Server');
       await Future.delayed(Duration(milliseconds: 200));
