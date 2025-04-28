@@ -31,7 +31,6 @@ class ServerProcess {
   });
 
   late SendPort _mainSendPort;
-  late Isolate _isolateProcess;
   final Completer<void> _isolateReady = Completer.sync();
   bool serverStarted = false;
 
@@ -63,7 +62,7 @@ class ServerProcess {
 
   static void _annotateData(String data) {
     data = data.trim();
-    data = data.replaceAll("\n", '');
+    data = data.replaceAll('\n', '');
     data = data.replaceAll('MAIN pid:', '\nMAIN pid:');
     data = data.replaceAll('WORKER pid:', '\nWORKER pid:');
     data = data.replaceAll('WEB_SERVER pid:', '\nWEB_SERVER pid:');
@@ -136,7 +135,7 @@ class ServerProcess {
   Future<void> spawn() async {
     final mainReceivePort = ReceivePort();
     mainReceivePort.listen(_handleResponsesFromIsolate);
-    _isolateProcess = await Isolate.spawn(_isolate, mainReceivePort.sendPort);
+    await Isolate.spawn(_isolate, mainReceivePort.sendPort);
   }
 
   // sends message to isolate

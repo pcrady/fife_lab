@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 def stdout_print(message: str) -> None:
     logger.info(message) 
 
+# TODO figure out what to do if the uvicorn server dies and or the script dies
 def start_gunicorn() -> None:
     HOST = "127.0.0.1"
     PORT = "8000"
@@ -28,6 +29,7 @@ def start_gunicorn() -> None:
     dir_path = os.path.dirname(os.path.realpath(__file__))
     server_process = subprocess.Popen(
         [
+            f"{dir_path}/kill_with_parent.sh",
             f"{dir_path}/fife_lab_env/bin/uvicorn",
             "main:app",
             "--host", HOST,
