@@ -61,10 +61,13 @@ class ServerProcess {
   }
 
   static void _annotateData(String data) {
+    data = data.trim();
     data = data.replaceAll("\n", '');
-    data = data.replaceAll('main pid:', '\nmain pid:');
-    data = data.replaceAll('worker pid:', '\nworker pid:');
-    AppLogger.i(data);
+    data = data.replaceAll('MAIN pid:', '\nMAIN pid:');
+    data = data.replaceAll('WORKER pid:', '\nWORKER pid:');
+    data = data.replaceAll('WEB_SERVER pid:', '\nWEB_SERVER pid:');
+    data = data.replaceAll('CONTROL_SERVER pid:', '\nCONTROL_SERVER pid:');
+    AppLogger.i(data.replaceFirst('\n', ''));
   }
 
   static bool _checkIfAddressInUse(String data) {

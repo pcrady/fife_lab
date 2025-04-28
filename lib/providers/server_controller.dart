@@ -9,8 +9,8 @@ part 'server_controller.g.dart';
 
 @riverpod
 class ServerController extends _$ServerController {
-  static const socketEndpoint = 'ws://127.0.0.1:8000/ws';
-  late WebSocketChannel channel;
+  final String serverIp = '127.0.0.1';
+  final int serverPort = 8001;
   final controller = StreamController<bool>();
 
   @override
@@ -22,21 +22,25 @@ class ServerController extends _$ServerController {
   Future<void> connectToKeepAliveSocket() async {
     controller.add(false);
     try {
-      final socket = await WebSocket.connect(socketEndpoint);
+      final socket = await Socket.connect(serverIp, serverPort);
       controller.add(true);
       AppLogger.i('socket connection successful.');
 
-      channel = IOWebSocketChannel(socket);
-      channel.stream.listen(
+      socket.listen(
         (msg) => AppLogger.i(msg),
-        onError: (err) => AppLogger.e(err),
         onDone: () async {
           // Keep alive socket died abruptly. Server should restart it
           // and then we reconnect.
           controller.add(false);
           AppLogger.w('Connection closed. Attempting to reconnect.');
+          socket.destroy();
           await Future.delayed(Duration(seconds: 2));
           connectToKeepAliveSocket();
+        },
+        onError: (err) {
+          controller.add(false);
+          socket.destroy();
+          AppLogger.e(err);
         },
       );
     } catch (e) {

@@ -2,6 +2,7 @@ import 'package:fife_lab/lib/app_logger.dart';
 import 'package:fife_lab/providers/server_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:dio/dio.dart';
 
 class MyHomePage extends ConsumerStatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -13,12 +14,16 @@ class MyHomePage extends ConsumerStatefulWidget {
 }
 
 class _MyHomePageState extends ConsumerState<MyHomePage> {
-  int _counter = 0;
+  String data = '0';
 
-  void _incrementCounter() {
+  void _incrementCounter() async {
     AppLogger.i('this is a test');
+    final dio = Dio(
+      BaseOptions(baseUrl: 'http://127.0.0.1:8000'),
+    );
+    final response = await dio.get('/test');
     setState(() {
-      _counter++;
+      data = response.data.toString();
     });
   }
 
@@ -65,7 +70,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
               loading: () => Text('loading'),
             ),
             Text(
-              '$_counter',
+              data,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
           ],
