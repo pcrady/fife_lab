@@ -1,6 +1,9 @@
+import 'package:fife_lab/lib/app_logger.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await AppLogger.init();
   runApp(const MyApp());
 }
 
@@ -33,6 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
   void _incrementCounter() {
+    AppLogger.i('this is a test');
     setState(() {
       _counter++;
     });
