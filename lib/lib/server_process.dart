@@ -31,6 +31,7 @@ class ServerProcess {
   });
 
   late SendPort _mainSendPort;
+  late Isolate _isolateProcess;
   final Completer<void> _isolateReady = Completer.sync();
   bool serverStarted = false;
 
@@ -86,11 +87,9 @@ class ServerProcess {
           infoColor: AnsiColor.fg(083),
         );
 
-        int retries = 0;
-        const maxRetries = 10;
         const retryDelay = Duration(milliseconds: 500);
 
-        while (retries < maxRetries) {
+        while (true) {
           final process = await Process.start(
             args.serverExecutable.path,
             args.serverArgs,
@@ -111,25 +110,24 @@ class ServerProcess {
             port.send(exitCode);
             break;
           } else {
-            retries += 1;
-            AppLogger.i('Retrying server start... attempt $retries');
+            AppLogger.i('Retrying server start...');
             await Future.delayed(retryDelay);
           }
-        }
-
-        if (retries >= maxRetries) {
-          port.send(false);
         }
       }
     });
   }
 
-  void _handleResponsesFromIsolate(dynamic message) {
+  void _handleResponsesFromIsolate(dynamic message) async {
     if (message is SendPort) {
       _mainSendPort = message;
       _isolateReady.complete();
     } else if (message is bool) {
       serverStarted = message;
+    } else if (message is int) {
+      AppLogger.f('Exit Code: $message \nRestarting Server');
+      await Future.delayed(Duration(milliseconds: 200));
+      await startServer();
     } else {
       AppLogger.i(message);
     }
@@ -138,7 +136,7 @@ class ServerProcess {
   Future<void> spawn() async {
     final mainReceivePort = ReceivePort();
     mainReceivePort.listen(_handleResponsesFromIsolate);
-    await Isolate.spawn(_isolate, mainReceivePort.sendPort);
+    _isolateProcess = await Isolate.spawn(_isolate, mainReceivePort.sendPort);
   }
 
   // sends message to isolate

@@ -64,6 +64,13 @@ def socket_server():
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         connected = False
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+        try:
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        except AttributeError:
+            pass  
+
         s.bind((HOST, PORT))
         s.listen()
         stdout_print(f"MAIN pid: {os.getpid()} - Control Server listening on {HOST}:{PORT}")
@@ -87,8 +94,8 @@ def handle_client(conn, addr):
             if not data:
                 stdout_print(f"CONTROL_SERVER pid: {control_server_pid} - Connection closed by {addr}")
                 stdout_print(f"CONTROL_SERVER pid: {control_server_pid} - Terminating processes")
-                # TODO restart control server
                 shutdown_gunicorn()
+                os.kill(control_server_pid, signal.SIGTERM)
                 break
             else:
                 stdout_print(f"CONTROL_SERVER pid: {control_server_pid} - Received from {addr}: {data!r}")

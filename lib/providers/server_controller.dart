@@ -2,8 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'package:fife_lab/lib/app_logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
-import 'package:web_socket_channel/io.dart';
 
 part 'server_controller.g.dart';
 
@@ -29,25 +27,22 @@ class ServerController extends _$ServerController {
       socket.listen(
         (msg) => AppLogger.i(msg),
         onDone: () async {
-          // Keep alive socket died abruptly. Server should restart it
-          // and then we reconnect.
-          controller.add(false);
           AppLogger.w('Connection closed. Attempting to reconnect.');
+          controller.add(false);
           socket.destroy();
           await Future.delayed(Duration(seconds: 2));
-          connectToKeepAliveSocket();
+          ref.invalidateSelf();
         },
         onError: (err) {
-          controller.add(false);
-          socket.destroy();
           AppLogger.e(err);
         },
+        cancelOnError: true,
       );
     } catch (e) {
-      // Unable to connect to socket. Retry
+      AppLogger.w('Unable to connect to socket.');
       controller.add(false);
-      await Future.delayed(Duration(milliseconds: 100));
-      connectToKeepAliveSocket();
+      await Future.delayed(Duration(seconds: 2));
+      ref.invalidateSelf();
     }
   }
 }
