@@ -67,12 +67,13 @@ async def shutdown():
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
+    global is_keep_alive_worker
     await websocket.accept()
     first_ws_seen.set()
     client = websocket.client
+    is_keep_alive_worker = True
     stdout_print(f"WebSocket connected: {client}")
     stdout_print(f"WebSocket connection pid: {os.getpid}")
-    is_keep_alive_worker = True
 
     try:
         while True:

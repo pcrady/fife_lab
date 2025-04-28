@@ -1,3 +1,4 @@
+import 'package:fife_lab/lib/app_logger.dart';
 import 'package:fife_lab/lib/initializer.dart';
 import 'package:fife_lab/providers/server_controller.dart';
 import 'package:flutter/material.dart';
