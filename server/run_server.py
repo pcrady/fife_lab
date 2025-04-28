@@ -5,9 +5,9 @@ import signal
 import subprocess
 import time
 import threading
-import json
 import logging
 import socket
+import ctypes
 
 server_process: subprocess.Popen | None = None
 
@@ -28,7 +28,7 @@ def start_gunicorn() -> None:
     dir_path = os.path.dirname(os.path.realpath(__file__))
     server_process = subprocess.Popen(
         [
-            dir_path + "/fife_lab_env/bin/uvicorn",
+            f"{dir_path}/fife_lab_env/bin/uvicorn",
             "main:app",
             "--host", HOST,
             "--port", PORT,

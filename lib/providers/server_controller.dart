@@ -9,7 +9,7 @@ part 'server_controller.g.dart';
 class ServerController extends _$ServerController {
   final String serverIp = '127.0.0.1';
   final int serverPort = 8001;
-  final controller = StreamController<bool>();
+  static final controller = StreamController<bool>.broadcast();
 
   @override
   Stream<bool> build() {

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fife_lab/lib/app_logger.dart';
 import 'package:fife_lab/providers/server_controller.dart';
 import 'package:flutter/material.dart';
@@ -65,6 +67,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                 }
               },
               error: (err, stack) {
+                AppLogger.e(err, stackTrace: stack);
                 return Text('error');
               },
               loading: () => Text('loading'),
