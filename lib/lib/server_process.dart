@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:isolate';
 import 'package:fife_lab/lib/app_logger.dart';
 import 'package:flutter/foundation.dart';
+import 'package:logger/logger.dart';
 import 'package:path/path.dart' as path;
 import 'dart:convert';
 
@@ -68,6 +69,7 @@ class ServerProcess {
         AppLogger.init(
           logPath: args.logPath,
           latestFileName: args.latestFileName,
+          infoColor: AnsiColor.fg(083),
         );
 
         int retries = 0;
@@ -86,7 +88,7 @@ class ServerProcess {
             data = data.replaceAll('main pid:', '\nmain pid:');
             data = data.replaceAll('worker pid:', '\nworker pid:');
 
-            AppLogger.w(data);
+            AppLogger.i(data);
             if (data.contains('Address already in use')) {
               addressInUse = true;
             }
@@ -97,7 +99,7 @@ class ServerProcess {
             data = data.replaceAll('main pid:', '\nmain pid:');
             data = data.replaceAll('worker pid:', '\nworker pid:');
 
-            AppLogger.w(data);
+            AppLogger.i(data);
             if (data.contains('Address already in use')) {
               addressInUse = true;
             }
@@ -110,7 +112,7 @@ class ServerProcess {
             break;
           } else {
             retries += 1;
-            AppLogger.w('Retrying server start... attempt $retries');
+            AppLogger.i('Retrying server start... attempt $retries');
             await Future.delayed(retryDelay);
           }
         }

@@ -10,10 +10,14 @@ class AppLogger {
   static void init({
     required String latestFileName,
     required String logPath,
+    AnsiColor infoColor = const AnsiColor.fg(032),
   }) {
     if (_completer.isCompleted) return;
     _logger = Logger(
       level: kReleaseMode ? Level.warning : Level.trace,
+      printer: PrettyPrinter.new(
+        levelColors: {Level.info: infoColor},
+      ),
       output: MultiOutput([
         ConsoleOutput(),
         AdvancedFileOutput(
