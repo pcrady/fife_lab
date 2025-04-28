@@ -60,6 +60,17 @@ class ServerProcess {
     return args;
   }
 
+  static void _annotateData(String data) {
+    data = data.replaceAll("\n", '');
+    data = data.replaceAll('main pid:', '\nmain pid:');
+    data = data.replaceAll('worker pid:', '\nworker pid:');
+    AppLogger.i(data);
+  }
+
+  static bool _checkIfAddressInUse(String data) {
+    return data.contains('address already in use') ? true : false;
+  }
+
   static void _isolate(SendPort port) async {
     final isolateReceivePort = ReceivePort();
     port.send(isolateReceivePort.sendPort);
@@ -83,27 +94,13 @@ class ServerProcess {
           );
 
           bool addressInUse = false;
-          process.stdout.transform(utf8.decoder).listen((data) {
-            data = data.replaceAll("\n", '');
-            data = data.replaceAll('main pid:', '\nmain pid:');
-            data = data.replaceAll('worker pid:', '\nworker pid:');
-
-            AppLogger.i(data);
-            if (data.contains('Address already in use')) {
-              addressInUse = true;
-            }
-          });
-
-          process.stderr.transform(utf8.decoder).listen((data) {
-            data = data.replaceAll("\n", '');
-            data = data.replaceAll('main pid:', '\nmain pid:');
-            data = data.replaceAll('worker pid:', '\nworker pid:');
-
-            AppLogger.i(data);
-            if (data.contains('Address already in use')) {
-              addressInUse = true;
-            }
-          });
+          final streams = [process.stdout, process.stderr];
+          for (final stream in streams) {
+            stream.transform(utf8.decoder).listen((data) {
+              _annotateData(data);
+              addressInUse = _checkIfAddressInUse(data);
+            });
+          }
 
           final exitCode = await process.exitCode;
           if (!addressInUse) {
