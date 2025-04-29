@@ -47,47 +47,52 @@ class _TitleDropdownState extends ConsumerState<TitleDropdown> {
         }
       case _Title.preferences:
         {
-          final theme = ref.watch(settingsProvider).when(
-                data: (data) => data.theme,
-                error: (_, __) => ColorTheme.dark,
-                loading: () => ColorTheme.dark,
-              );
-
           FifeLabDialog.showDialogWrapper(
             title: 'Preferences',
             content: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Theme'),
-                ToggleButtons(
-                  isSelected: [theme == ColorTheme.light, theme == ColorTheme.dark],
-                  onPressed: (int index) async {
-                    final notifier = ref.read(settingsProvider.notifier);
-                    if (index == 0) {
-                      await notifier.setColorTheme(colorTheme: ColorTheme.light);
-                    } else {
-                      await notifier.setColorTheme(colorTheme: ColorTheme.dark);
-                    }
-                  },
-                  borderRadius: BorderRadius.circular(4),
-                  children: const [
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12),
-                      child: Icon(
-                        Icons.sunny,
-                        size: 20,
-                        color: Colors.amber,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12),
-                      child: Icon(
-                        Icons.dark_mode,
-                        size: 20,
-                        color: Colors.pink,
-                      ),
-                    ),
-                  ],
+                const Text('Color Theme'),
+                StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                    final theme = ref.watch(settingsProvider).when(
+                      data: (data) => data.theme,
+                      error: (_, __) => ColorTheme.dark,
+                      loading: () => ColorTheme.dark,
+                    );
+
+                    return ToggleButtons(
+                      isSelected: [theme == ColorTheme.light, theme == ColorTheme.dark],
+                      onPressed: (int index) async {
+                        final notifier = ref.read(settingsProvider.notifier);
+                        if (index == 0) {
+                          await notifier.setColorTheme(colorTheme: ColorTheme.light);
+                        } else {
+                          await notifier.setColorTheme(colorTheme: ColorTheme.dark);
+                        }
+                        setState(() {});
+                      },
+                      borderRadius: BorderRadius.circular(4),
+                      children: const [
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          child: Icon(
+                            Icons.sunny,
+                            size: 20,
+                            color: Colors.amber,
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          child: Icon(
+                            Icons.dark_mode,
+                            size: 20,
+                            color: Colors.pink,
+                          ),
+                        ),
+                      ],
+                    );
+                  }
                 ),
               ],
             ),

@@ -48,10 +48,6 @@ class FifeLab extends ConsumerWidget with FifeLabRouter {
               color: Color(0xff1f004a),
               foregroundColor: Colors.white,
             ),
-            /*textTheme: Theme.of(context).textTheme.apply(
-              bodyColor: Colors.white,
-              displayColor: Colors.white,
-            ),*/
             scaffoldBackgroundColor: const Color(0xff101418),
             buttonTheme: const ButtonThemeData(
               buttonColor: Colors.deepPurple,
@@ -67,6 +63,15 @@ class FifeLab extends ConsumerWidget with FifeLabRouter {
               labelStyle: TextStyle(color: unselectedColor),
               hintStyle: TextStyle(color: unselectedColor),
               focusColor: Colors.blue,
+            ),
+            dialogTheme: const DialogTheme(
+              titleTextStyle: TextStyle(
+                color: Colors.white,
+                fontSize: 24.0,
+              ),
+              contentTextStyle: TextStyle(
+                color: Colors.white,
+              ),
             ),
             useMaterial3: true,
           ),

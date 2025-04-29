@@ -32,6 +32,11 @@ class Settings extends _$Settings {
     required ColorTheme colorTheme,
   }) async {
     final previousState = await future;
-    state = AsyncData(previousState.copyWith(theme: colorTheme));
+    final newState = previousState.copyWith(theme: colorTheme);
+    state = AsyncData(newState);
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final newSettingsString = jsonEncode(newState.toJson());
+    prefs.setString(_settingsKey, newSettingsString);
   }
 }
