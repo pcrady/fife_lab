@@ -1,10 +1,5 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
-import 'dart:isolate';
-
-import 'package:fife_lab/lib/app_logger.dart';
-import 'package:fife_lab/lib/initializer.dart';
+import 'package:fife_lab/models/settings_model.dart';
+import 'package:fife_lab/providers/settings.dart';
 import 'package:fife_lab/widgets/dropdown_buttons/app_bar_dropdown.dart';
 import 'package:fife_lab/widgets/fife_lab_dialog.dart';
 import 'package:fife_lab/widgets/logfile_reader.dart';
@@ -34,7 +29,7 @@ class TitleDropdown extends ConsumerStatefulWidget {
 }
 
 class _TitleDropdownState extends ConsumerState<TitleDropdown> {
-  void onSelected(_Title choice) {
+  void onSelected(_Title choice) async {
     switch (choice) {
       case _Title.about:
         {
@@ -51,17 +46,60 @@ class _TitleDropdownState extends ConsumerState<TitleDropdown> {
           );
         }
       case _Title.preferences:
-        FifeLabDialog.showDialogWrapper(
-          title: 'Preferences',
-          content: Text('asdf'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Close'),
+        {
+          final theme = ref.watch(settingsProvider).when(
+                data: (data) => data.theme,
+                error: (_, __) => ColorTheme.dark,
+                loading: () => ColorTheme.dark,
+              );
+
+          FifeLabDialog.showDialogWrapper(
+            title: 'Preferences',
+            content: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Theme'),
+                ToggleButtons(
+                  isSelected: [theme == ColorTheme.light, theme == ColorTheme.dark],
+                  onPressed: (int index) async {
+                    final notifier = ref.read(settingsProvider.notifier);
+                    if (index == 0) {
+                      await notifier.setColorTheme(colorTheme: ColorTheme.light);
+                    } else {
+                      await notifier.setColorTheme(colorTheme: ColorTheme.dark);
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(4),
+                  children: const [
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      child: Icon(
+                        Icons.sunny,
+                        size: 20,
+                        color: Colors.amber,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      child: Icon(
+                        Icons.dark_mode,
+                        size: 20,
+                        color: Colors.pink,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
-          context: context,
-        );
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Close'),
+              ),
+            ],
+            context: context,
+          );
+        }
       case _Title.serverLogs:
         FifeLabDialog.showDialogWrapper(
           title: 'Server Logs',

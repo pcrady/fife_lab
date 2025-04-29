@@ -101,7 +101,7 @@ class _LogfileReaderState extends State<LogfileReader> with TickerProviderStateM
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('Loading...'),
+                        Text('Loading Logs...'),
                         SizedBox(height: 8.0),
                         SizedBox(width: 100, child: LinearProgressIndicator()),
                       ],
