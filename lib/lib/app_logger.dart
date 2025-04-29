@@ -15,14 +15,17 @@ class AppLogger {
     if (_completer.isCompleted) return;
     _logger = Logger(
       level: kReleaseMode ? Level.warning : Level.trace,
-      printer: PrettyPrinter.new(
+      printer: PrettyPrinter(
         levelColors: {Level.info: infoColor},
+        dateTimeFormat: DateTimeFormat.dateAndTime,
       ),
       output: MultiOutput([
         ConsoleOutput(),
         AdvancedFileOutput(
           path: logPath,
           latestFileName: latestFileName,
+          maxFileSizeKB: 512,
+          maxRotatedFilesCount: 10,
         ),
       ]),
     );
@@ -36,8 +39,6 @@ class AppLogger {
       throw StateError('AppLogger not initialized – call AppLogger.init() first.');
     }
   }
-
-  // TODO make a command for the server that prints in a different color
 
   static void d(
     dynamic message, {

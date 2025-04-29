@@ -121,16 +121,16 @@ class _LogfileReaderState extends State<LogfileReader> with TickerProviderStateM
                   thumbColor: Colors.white30,
                   radius: const Radius.circular(20),
                   controller: scrollController,
-                  child: ListView.builder(
-                    controller: scrollController,
-                    shrinkWrap: true,
-                    reverse: true,
-                    itemCount: lines.length,
-                    itemBuilder: (context, index) {
-                      return Row(
-                        children: [
-                          Expanded(
-                            child: SelectionArea(
+                  child: SelectionArea(
+                    child: ListView.builder(
+                      controller: scrollController,
+                      shrinkWrap: true,
+                      reverse: true,
+                      itemCount: lines.length,
+                      itemBuilder: (context, index) {
+                        return Row(
+                          children: [
+                            Expanded(
                               child: Text(
                                 lines[index],
                                 style: const TextStyle(
@@ -141,10 +141,10 @@ class _LogfileReaderState extends State<LogfileReader> with TickerProviderStateM
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                          ),
-                        ],
-                      );
-                    },
+                          ],
+                        );
+                      },
+                    ),
                   ),
                 ),
               );
