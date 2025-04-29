@@ -134,7 +134,6 @@ class _LogfileReaderState extends State<LogfileReader> with TickerProviderStateM
                               child: Text(
                                 lines[index],
                                 style: const TextStyle(
-                                  color: Colors.white,
                                   fontFamily: 'monospace',
                                   fontFamilyFallback: ['Courier', 'Courier New'],
                                 ),

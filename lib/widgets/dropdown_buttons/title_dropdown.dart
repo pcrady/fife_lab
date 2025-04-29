@@ -155,14 +155,16 @@ class _AboutContent extends StatelessWidget {
           return Container();
         }
         final packageInfo = snapshot.data;
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('App Name: ${packageInfo?.appName ?? 'Error'}'),
-            Text('Version: ${packageInfo?.version ?? 'Error'}'),
-            Text('Build Number: ${packageInfo?.buildNumber ?? 'Error'}'),
-          ],
+        return SelectionArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('App Name: ${packageInfo?.appName ?? 'Error'}'),
+              Text('Version: ${packageInfo?.version ?? 'Error'}'),
+              Text('Build Number: ${packageInfo?.buildNumber ?? 'Error'}'),
+            ],
+          ),
         );
       },
     );
