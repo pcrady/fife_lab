@@ -1,3 +1,4 @@
+import 'package:fife_lab/widgets/dropdown_buttons/file_dropdown.dart';
 import 'package:fife_lab/widgets/dropdown_buttons/functions_dropdow.dart';
 import 'package:fife_lab/widgets/dropdown_buttons/title_dropdown.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +29,7 @@ class _FifeLabAppBarState extends ConsumerState<FifeLabAppBar> {
       title: Row(
         children: [
           TitleDropdown(),
+          FileDropdown(),
           FunctionsDropdown(),
         ],
       ),

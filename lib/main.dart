@@ -35,52 +35,57 @@ class FifeLab extends ConsumerWidget with FifeLabRouter {
     return _EagerInitialization(
       child: MaterialApp.router(
         title: 'Fife Image',
-        theme:  switch (theme) {
+        theme: switch (theme) {
           ColorTheme.dark => ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurpleAccent),
-            elevatedButtonTheme: ElevatedButtonThemeData(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurpleAccent),
+              elevatedButtonTheme: ElevatedButtonThemeData(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+              appBarTheme: const AppBarTheme(
+                color: Color(0xff1f004a),
+                foregroundColor: Colors.white,
+              ),
+              scaffoldBackgroundColor: const Color(0xff101418),
+              buttonTheme: const ButtonThemeData(
+                buttonColor: Colors.deepPurple,
+                textTheme: ButtonTextTheme.primary,
+              ),
+              inputDecorationTheme: const InputDecorationTheme(
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.blue),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: unselectedColor),
+                ),
+                labelStyle: TextStyle(color: unselectedColor),
+                hintStyle: TextStyle(color: unselectedColor),
+                focusColor: Colors.blue,
+              ),
+              dialogTheme: const DialogTheme(
+                titleTextStyle: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24.0,
+                ),
+                contentTextStyle: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+              textTheme: const TextTheme(
+                bodyLarge: TextStyle(color: Colors.white), // for Text()
+                bodyMedium: TextStyle(color: Colors.white), // for e.g. smaller text
+                bodySmall: TextStyle(color: Colors.white),
+              ),
+              useMaterial3: true,
+            ),
+          ColorTheme.light => ThemeData(
+              appBarTheme: const AppBarTheme(
+                color: Color(0xff1f004a),
                 foregroundColor: Colors.white,
               ),
             ),
-            appBarTheme: const AppBarTheme(
-              color: Color(0xff1f004a),
-              foregroundColor: Colors.white,
-            ),
-            scaffoldBackgroundColor: const Color(0xff101418),
-            buttonTheme: const ButtonThemeData(
-              buttonColor: Colors.deepPurple,
-              textTheme: ButtonTextTheme.primary,
-            ),
-            inputDecorationTheme: const InputDecorationTheme(
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.blue),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: unselectedColor),
-              ),
-              labelStyle: TextStyle(color: unselectedColor),
-              hintStyle: TextStyle(color: unselectedColor),
-              focusColor: Colors.blue,
-            ),
-            dialogTheme: const DialogTheme(
-              titleTextStyle: TextStyle(
-                color: Colors.white,
-                fontSize: 24.0,
-              ),
-              contentTextStyle: TextStyle(
-                color: Colors.white,
-              ),
-            ),
-            useMaterial3: true,
-          ),
-          ColorTheme.light => ThemeData(
-            appBarTheme: const AppBarTheme(
-              color: Color(0xff1f004a),
-              foregroundColor: Colors.white,
-            ),
-          ),
         },
         routerConfig: router,
       ),

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:fife_lab/lib/app_logger.dart';
 import 'package:fife_lab/models/settings_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,20 +13,32 @@ class Settings extends _$Settings {
 
   @override
   Future<SettingsModel> build() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
     late SettingsModel settingsModel;
-    final settingsString = prefs.getString(_settingsKey);
 
-    if (settingsString == null) {
-      settingsModel = SettingsModel();
-      final newSettingsString = jsonEncode(settingsModel.toJson());
-      prefs.setString(_settingsKey, newSettingsString);
-    } else {
-      final settingsModelMap = jsonDecode(settingsString);
-      settingsModel = SettingsModel.fromJson(settingsModelMap);
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final settingsString = prefs.getString(_settingsKey);
+
+      if (settingsString == null) {
+        settingsModel = SettingsModel();
+        final newSettingsString = jsonEncode(settingsModel.toJson());
+        prefs.setString(_settingsKey, newSettingsString);
+      } else {
+        final settingsModelMap = jsonDecode(settingsString);
+        settingsModel = SettingsModel.fromJson(settingsModelMap);
+      }
+    } catch (err) {
+      AppLogger.e(err);
+      rethrow;
     }
 
     return settingsModel;
+  }
+
+  Future<void> _writeStateToDisk(SettingsModel newState) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final newSettingsString = jsonEncode(newState.toJson());
+    prefs.setString(_settingsKey, newSettingsString);
   }
 
   Future<void> setColorTheme({
@@ -33,10 +46,7 @@ class Settings extends _$Settings {
   }) async {
     final previousState = await future;
     final newState = previousState.copyWith(theme: colorTheme);
+    await _writeStateToDisk(newState);
     state = AsyncData(newState);
-
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final newSettingsString = jsonEncode(newState.toJson());
-    prefs.setString(_settingsKey, newSettingsString);
   }
 }

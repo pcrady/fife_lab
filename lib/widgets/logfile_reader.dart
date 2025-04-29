@@ -87,10 +87,16 @@ class _LogfileReaderState extends State<LogfileReader> with TickerProviderStateM
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SelectionArea(
-            child: Text('Server Log File At: ${Initializer.serverLogPath}'),
+            child: Text(
+              'Server Log File At: ${Initializer.serverLogPath}',
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 16,
+              ),
+            ),
           ),
           const Divider(),
-          SizedBox(height: 8.0),
+          SizedBox(height: 16.0),
           FutureBuilder<List<String>>(
             future: _readFile(),
             builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {

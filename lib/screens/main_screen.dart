@@ -56,17 +56,20 @@ class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
               type: MaterialType.transparency,
               child: Container(
                 alignment: Alignment.center,
-                child: Row(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Fuck'),
-                    Text('Connecting To Sever'),
+                    Text(
+                      'Connecting To Sever..',
+                    ),
+                    SizedBox(height: 8.0),
+                    SizedBox(width: 200, child: LinearProgressIndicator()),
                   ],
                 ),
               ),
             ),
           false => Container(),
-        }
+        },
       ],
     );
   }

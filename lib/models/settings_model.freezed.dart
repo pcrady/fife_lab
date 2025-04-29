@@ -16,6 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SettingsModel {
   ColorTheme get theme;
+  String? get projectDir;
 
   /// Create a copy of SettingsModel
   /// with the given fields replaced by the non-null parameter values.
@@ -33,16 +34,18 @@ mixin _$SettingsModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is SettingsModel &&
-            (identical(other.theme, theme) || other.theme == theme));
+            (identical(other.theme, theme) || other.theme == theme) &&
+            (identical(other.projectDir, projectDir) ||
+                other.projectDir == projectDir));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, theme);
+  int get hashCode => Object.hash(runtimeType, theme, projectDir);
 
   @override
   String toString() {
-    return 'SettingsModel(theme: $theme)';
+    return 'SettingsModel(theme: $theme, projectDir: $projectDir)';
   }
 }
 
@@ -52,7 +55,7 @@ abstract mixin class $SettingsModelCopyWith<$Res> {
           SettingsModel value, $Res Function(SettingsModel) _then) =
       _$SettingsModelCopyWithImpl;
   @useResult
-  $Res call({ColorTheme theme});
+  $Res call({ColorTheme theme, String? projectDir});
 }
 
 /// @nodoc
@@ -69,12 +72,17 @@ class _$SettingsModelCopyWithImpl<$Res>
   @override
   $Res call({
     Object? theme = null,
+    Object? projectDir = freezed,
   }) {
     return _then(_self.copyWith(
       theme: null == theme
           ? _self.theme
           : theme // ignore: cast_nullable_to_non_nullable
               as ColorTheme,
+      projectDir: freezed == projectDir
+          ? _self.projectDir
+          : projectDir // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -84,13 +92,15 @@ class _$SettingsModelCopyWithImpl<$Res>
 @JsonSerializable(
     fieldRename: FieldRename.snake, explicitToJson: true, includeIfNull: false)
 class _SettingsModel implements SettingsModel {
-  const _SettingsModel({this.theme = ColorTheme.dark});
+  const _SettingsModel({this.theme = ColorTheme.dark, this.projectDir});
   factory _SettingsModel.fromJson(Map<String, dynamic> json) =>
       _$SettingsModelFromJson(json);
 
   @override
   @JsonKey()
   final ColorTheme theme;
+  @override
+  final String? projectDir;
 
   /// Create a copy of SettingsModel
   /// with the given fields replaced by the non-null parameter values.
@@ -112,16 +122,18 @@ class _SettingsModel implements SettingsModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _SettingsModel &&
-            (identical(other.theme, theme) || other.theme == theme));
+            (identical(other.theme, theme) || other.theme == theme) &&
+            (identical(other.projectDir, projectDir) ||
+                other.projectDir == projectDir));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, theme);
+  int get hashCode => Object.hash(runtimeType, theme, projectDir);
 
   @override
   String toString() {
-    return 'SettingsModel(theme: $theme)';
+    return 'SettingsModel(theme: $theme, projectDir: $projectDir)';
   }
 }
 
@@ -133,7 +145,7 @@ abstract mixin class _$SettingsModelCopyWith<$Res>
       __$SettingsModelCopyWithImpl;
   @override
   @useResult
-  $Res call({ColorTheme theme});
+  $Res call({ColorTheme theme, String? projectDir});
 }
 
 /// @nodoc
@@ -150,12 +162,17 @@ class __$SettingsModelCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? theme = null,
+    Object? projectDir = freezed,
   }) {
     return _then(_SettingsModel(
       theme: null == theme
           ? _self.theme
           : theme // ignore: cast_nullable_to_non_nullable
               as ColorTheme,
+      projectDir: freezed == projectDir
+          ? _self.projectDir
+          : projectDir // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
