@@ -1,9 +1,8 @@
-import 'package:fife_lab/lib/app_logger.dart';
+import 'package:fife_lab/lib/fife_lab_router.dart';
 import 'package:fife_lab/lib/initializer.dart';
 import 'package:fife_lab/providers/server_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'screens/main_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,19 +15,51 @@ void main() async {
   );
 }
 
-class FifeLab extends StatelessWidget {
-  const FifeLab({super.key});
+class FifeLab extends StatelessWidget with FifeLabRouter {
+  FifeLab({super.key});
+
+  static const unselectedColor = Colors.white54;
 
   @override
   Widget build(BuildContext context) {
     return _EagerInitialization(
-      child: MaterialApp(
-        title: 'Flutter Demo',
+      child: MaterialApp.router(
+        title: 'Fife Image',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurpleAccent),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.deepPurple,
+              foregroundColor: Colors.white,
+            ),
+          ),
+          appBarTheme: const AppBarTheme(
+            color: Color(0xff1f004a),
+            foregroundColor: Colors.white,
+          ),
+          textTheme: Theme.of(context).textTheme.apply(
+                bodyColor: Colors.white,
+                displayColor: Colors.white,
+              ),
+          scaffoldBackgroundColor: const Color(0xff101418),
+          buttonTheme: const ButtonThemeData(
+            buttonColor: Colors.deepPurple,
+            textTheme: ButtonTextTheme.primary,
+          ),
+          inputDecorationTheme: const InputDecorationTheme(
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.blue),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: unselectedColor),
+            ),
+            labelStyle: TextStyle(color: unselectedColor),
+            hintStyle: TextStyle(color: unselectedColor),
+            focusColor: Colors.blue,
+          ),
           useMaterial3: true,
         ),
-        home: const MyHomePage(title: 'Flutter Demo Home Page'),
+        routerConfig: router,
       ),
     );
   }
