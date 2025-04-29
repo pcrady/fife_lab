@@ -8,17 +8,24 @@ import 'package:path/path.dart' as p;
 class Initializer {
   Initializer._();
 
+  static Directory? logDir;
+  static String? appLogPath;
+  static String? serverLogPath;
+
   static Future<void> init() async {
     final docs = await getLibraryDirectory();
     late String logDirPath;
 
     if (Platform.isMacOS) {
       logDirPath = p.join(docs.path, 'Logs', 'FifeLab');
-      final logDir = Directory(logDirPath);
-      final exists = await logDir.exists();
+
+      logDir = Directory(logDirPath);
+      assert(logDir != null);
+
+      final exists = await logDir!.exists();
 
       if (!exists) {
-        await logDir.create(recursive: true);
+        await logDir!.create(recursive: true);
       }
     } else if (Platform.isWindows) {
       throw 'Windows is not ready yet';
@@ -26,14 +33,23 @@ class Initializer {
       throw 'Unsupported platform';
     }
 
+    final appLatest = 'app_latest.log';
+    final serverLatest = 'server_latest.log';
+
+    appLogPath = p.join(logDirPath, appLatest);
+    serverLogPath = p.join(logDirPath, serverLatest);
+
+    assert(appLogPath != null);
+    assert(serverLogPath != null);
+
     AppLogger.init(
       logPath: logDirPath,
-      latestFileName: 'app_latest.log',
+      latestFileName: appLatest,
     );
 
     final serverProcess = ServerProcess(
       logPath: logDirPath,
-      latestFileName: 'server_latest.log',
+      latestFileName: serverLatest,
     );
 
     await serverProcess.spawn();
