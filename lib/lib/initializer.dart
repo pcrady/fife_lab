@@ -11,6 +11,7 @@ class Initializer {
   static Directory? logDir;
   static String? appLogPath;
   static String? serverLogPath;
+  static Completer initialised = Completer();
 
   static Future<void> init() async {
     final docs = await getLibraryDirectory();
@@ -54,5 +55,6 @@ class Initializer {
 
     await serverProcess.spawn();
     await serverProcess.startServer();
+    initialised.complete();
   }
 }
