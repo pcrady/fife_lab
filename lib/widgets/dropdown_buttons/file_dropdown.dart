@@ -113,7 +113,7 @@ class _NewProjectDialogState extends ConsumerState<_NewProjectDialog> {
       title: Text('New Project'),
       content: SizedBox(
         width: 600,
-        height: 160,
+        height: 180,
         child: Form(
           key: _formKey,
           child: Column(
@@ -138,8 +138,6 @@ class _NewProjectDialogState extends ConsumerState<_NewProjectDialog> {
                           initialDirectory: settingsModel.projectsDirPath,
                         );
                         if (projectsDirPath != null) {
-                          final settings = ref.read(settingsProvider.notifier);
-                          await settings.setProjectsDir(projectsDirPath: projectsDirPath);
                           _projectsDirController.text = projectsDirPath;
                         }
                       } catch (err, stack) {
@@ -152,6 +150,9 @@ class _NewProjectDialogState extends ConsumerState<_NewProjectDialog> {
               ),
               SizedBox(height: 16),
               TextFormField(
+                validator: (_) {
+                  return _projectNameController.text.isEmpty ? 'Enter a Project Name' : null;
+                },
                 controller: _projectNameController,
                 decoration: InputDecoration(
                   hintText: 'Enter a name for your project',
@@ -174,8 +175,8 @@ class _NewProjectDialogState extends ConsumerState<_NewProjectDialog> {
             if (_formKey.currentState!.validate()) {
               try {
                 final settings = ref.read(settingsProvider.notifier);
-                await settings.setProjectsDir(projectsDirPath: _projectsDirController.text);
-                await settings.setProject(projectName: _projectNameController.text);
+                await settings.setProjectsDir(projectsDir: Directory(_projectsDirController.text));
+                await settings.setProjectName(projectName: _projectNameController.text);
               } catch (err, stack) {
                 AppLogger.e(err, stackTrace: stack);
               }
@@ -199,13 +200,85 @@ class _OpenProjectDialog extends ConsumerStatefulWidget {
 }
 
 class __OpenProjectDialogState extends ConsumerState<_OpenProjectDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _projectDirController;
+  bool _projectDirExists = false;
+
+  @override
+  void initState() {
+    _projectDirController = TextEditingController();
+
+    _projectDirController.addListener(() async {
+      try {
+        final exists = await Directory(_projectDirController.text).exists();
+        setState(() => _projectDirExists = exists);
+      } catch (err, stack) {
+        AppLogger.e(err, stackTrace: stack);
+      }
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        final settings = await ref.read(settingsProvider.future);
+        _projectDirController.text = settings.currentProjectDir?.path ?? 'None';
+      } catch (err, stack) {
+        AppLogger.e(err, stackTrace: stack);
+      }
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _projectDirController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text('Open Project'),
       content: SizedBox(
         width: 600,
-        height: 160,
+        height: 75,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextFormField(
+                controller: _projectDirController,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                validator: (_) {
+                  // TODO perform more validation than just existence
+                  return _projectDirExists ? null : 'Project Directory is invalid';
+                },
+                decoration: InputDecoration(
+                  hintText: 'Enter a project directory',
+                  label: Text('Project Directory'),
+                  suffixIcon: IconButton(
+                    onPressed: () async {
+                      try {
+                        final settingsModel = await ref.read(settingsProvider.future);
+                        String? projectsDirPath = await FilePicker.platform.getDirectoryPath(
+                          dialogTitle: 'Select Project Directory',
+                          initialDirectory: settingsModel.projectsDirPath,
+                        );
+                        if (projectsDirPath != null) {
+                          _projectDirController.text = projectsDirPath;
+                        }
+                      } catch (err, stack) {
+                        AppLogger.e(err, stackTrace: stack);
+                      }
+                    },
+                    icon: Icon(Icons.keyboard_arrow_down),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
       actions: <Widget>[
         TextButton(
@@ -214,14 +287,19 @@ class __OpenProjectDialogState extends ConsumerState<_OpenProjectDialog> {
         ),
         TextButton(
           onPressed: () async {
-            try {} catch (err, stack) {
-              AppLogger.e(err, stackTrace: stack);
-            }
-            if (context.mounted) {
-              Navigator.of(context).pop();
+            if (_formKey.currentState!.validate()) {
+              try {
+                final settings = ref.read(settingsProvider.notifier);
+                await settings.setProjectDir(projectDir: Directory(_projectDirController.text));
+              } catch (err, stack) {
+                AppLogger.e(err, stackTrace: stack);
+              }
+              if (context.mounted) {
+                Navigator.of(context).pop();
+              }
             }
           },
-          child: const Text('Create'),
+          child: const Text('Open'),
         ),
       ],
     );

@@ -56,19 +56,18 @@ class Settings extends _$Settings {
   }
 
   Future<void> setProjectsDir({
-    required String projectsDirPath,
+    required Directory projectsDir,
   }) async {
-    final exists = await Directory(projectsDirPath).exists();
-    if (!exists) {
-      throw 'Project Directory: $projectsDirPath does not exist.';
+    if (!await projectsDir.exists()) {
+      throw 'Project Directory: ${projectsDir.path} does not exist.';
     }
     final previousState = await future;
-    final newState = previousState.copyWith(projectsDirPath: projectsDirPath);
+    final newState = previousState.copyWith(projectsDirPath: projectsDir.path);
     await _writeStateToDisk(newState);
     state = AsyncData(newState);
   }
 
-  Future<void> setProject({
+  Future<void> setProjectName({
     required String projectName,
   }) async {
     final previousState = await future;
@@ -87,5 +86,20 @@ class Settings extends _$Settings {
       final projectDir = Directory(path.join(projectsDirPath, newState.projectName));
       projectDir.create(recursive: true);
     }
+  }
+
+  Future<void> setProjectDir({
+    required Directory projectDir,
+  }) async {
+    final projectName = path.basename(projectDir.path);
+    final projectsDirPath = projectDir.parent.path;
+
+    final previousState = await future;
+    final newState = previousState.copyWith(
+      projectsDirPath: projectsDirPath,
+      projectName: projectName,
+    );
+    await _writeStateToDisk(newState);
+    state = AsyncData(newState);
   }
 }
