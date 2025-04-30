@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:fife_lab/lib/app_logger.dart';
+import 'package:fife_lab/lib/initializer.dart';
 import 'package:fife_lab/models/settings_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,7 +10,7 @@ part 'settings.g.dart';
 
 @riverpod
 class Settings extends _$Settings {
-  static const _settingsKey = 'settings';
+  static const _settingsKey = 'fifeLabSettings';
 
   @override
   Future<SettingsModel> build() async {
@@ -20,9 +21,11 @@ class Settings extends _$Settings {
       final settingsString = prefs.getString(_settingsKey);
 
       if (settingsString == null) {
-        settingsModel = SettingsModel();
-        final newSettingsString = jsonEncode(settingsModel.toJson());
-        prefs.setString(_settingsKey, newSettingsString);
+        await Initializer.initialised.future;
+        settingsModel = SettingsModel(
+          projectsDirPath: Initializer.projectsDir?.path,
+        );
+        await _writeStateToDisk(settingsModel);
       } else {
         final settingsModelMap = jsonDecode(settingsString);
         settingsModel = SettingsModel.fromJson(settingsModelMap);
@@ -38,7 +41,7 @@ class Settings extends _$Settings {
   Future<void> _writeStateToDisk(SettingsModel newState) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final newSettingsString = jsonEncode(newState.toJson());
-    prefs.setString(_settingsKey, newSettingsString);
+    await prefs.setString(_settingsKey, newSettingsString);
   }
 
   Future<void> setColorTheme({
@@ -46,6 +49,15 @@ class Settings extends _$Settings {
   }) async {
     final previousState = await future;
     final newState = previousState.copyWith(theme: colorTheme);
+    await _writeStateToDisk(newState);
+    state = AsyncData(newState);
+  }
+
+  Future<void> setProjectsDir({
+    required String projectsDirPath,
+  }) async {
+    final previousState = await future;
+    final newState = previousState.copyWith(projectsDirPath: projectsDirPath);
     await _writeStateToDisk(newState);
     state = AsyncData(newState);
   }

@@ -7,13 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-enum _Title {
+enum _FifeLab {
   about('About'),
   preferences('Preferences'),
   serverLogs('Server Logs'),
   appLogs('App Logs');
 
-  const _Title(this.displayTitle);
+  const _FifeLab(this.displayTitle);
 
   final String displayTitle;
 
@@ -21,17 +21,17 @@ enum _Title {
   String toString() => displayTitle;
 }
 
-class TitleDropdown extends ConsumerStatefulWidget {
-  const TitleDropdown({super.key});
+class FifeLabDropdown extends ConsumerStatefulWidget {
+  const FifeLabDropdown({super.key});
 
   @override
   ConsumerState createState() => _TitleDropdownState();
 }
 
-class _TitleDropdownState extends ConsumerState<TitleDropdown> {
-  void onSelected(_Title choice) async {
+class _TitleDropdownState extends ConsumerState<FifeLabDropdown> {
+  void onSelected(_FifeLab choice) async {
     switch (choice) {
-      case _Title.about:
+      case _FifeLab.about:
         {
           FifeLabDialog.showDialogWrapper(
             title: 'About',
@@ -45,7 +45,7 @@ class _TitleDropdownState extends ConsumerState<TitleDropdown> {
             context: context,
           );
         }
-      case _Title.preferences:
+      case _FifeLab.preferences:
         {
           FifeLabDialog.showDialogWrapper(
             title: 'Preferences',
@@ -53,47 +53,45 @@ class _TitleDropdownState extends ConsumerState<TitleDropdown> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text('Color Theme'),
-                StatefulBuilder(
-                  builder: (BuildContext context, StateSetter setState) {
-                    final theme = ref.watch(settingsProvider).when(
-                      data: (data) => data.theme,
-                      error: (_, __) => ColorTheme.dark,
-                      loading: () => ColorTheme.dark,
-                    );
+                StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
+                  final theme = ref.watch(settingsProvider).when(
+                        data: (data) => data.theme,
+                        error: (_, __) => ColorTheme.dark,
+                        loading: () => ColorTheme.dark,
+                      );
 
-                    return ToggleButtons(
-                      isSelected: [theme == ColorTheme.light, theme == ColorTheme.dark],
-                      onPressed: (int index) async {
-                        final notifier = ref.read(settingsProvider.notifier);
-                        if (index == 0) {
-                          await notifier.setColorTheme(colorTheme: ColorTheme.light);
-                        } else {
-                          await notifier.setColorTheme(colorTheme: ColorTheme.dark);
-                        }
-                        setState(() {});
-                      },
-                      borderRadius: BorderRadius.circular(4),
-                      children: const [
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12),
-                          child: Icon(
-                            Icons.sunny,
-                            size: 20,
-                            color: Colors.amber,
-                          ),
+                  return ToggleButtons(
+                    isSelected: [theme == ColorTheme.light, theme == ColorTheme.dark],
+                    onPressed: (int index) async {
+                      final notifier = ref.read(settingsProvider.notifier);
+                      if (index == 0) {
+                        await notifier.setColorTheme(colorTheme: ColorTheme.light);
+                      } else {
+                        await notifier.setColorTheme(colorTheme: ColorTheme.dark);
+                      }
+                      setState(() {});
+                    },
+                    borderRadius: BorderRadius.circular(4),
+                    children: const [
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12),
+                        child: Icon(
+                          Icons.sunny,
+                          size: 20,
+                          color: Colors.amber,
                         ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 12),
-                          child: Icon(
-                            Icons.dark_mode,
-                            size: 20,
-                            color: Colors.pink,
-                          ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12),
+                        child: Icon(
+                          Icons.dark_mode,
+                          size: 20,
+                          color: Colors.pink,
                         ),
-                      ],
-                    );
-                  }
-                ),
+                      ),
+                    ],
+                  );
+                }),
               ],
             ),
             actions: <Widget>[
@@ -105,7 +103,7 @@ class _TitleDropdownState extends ConsumerState<TitleDropdown> {
             context: context,
           );
         }
-      case _Title.serverLogs:
+      case _FifeLab.serverLogs:
         FifeLabDialog.showDialogWrapper(
           title: 'Server Logs',
           content: LogfileReader(logType: LogType.serverLogs),
@@ -117,7 +115,7 @@ class _TitleDropdownState extends ConsumerState<TitleDropdown> {
           ],
           context: context,
         );
-      case _Title.appLogs:
+      case _FifeLab.appLogs:
         FifeLabDialog.showDialogWrapper(
           title: 'App Logs',
           content: LogfileReader(logType: LogType.appLogs),
@@ -137,7 +135,7 @@ class _TitleDropdownState extends ConsumerState<TitleDropdown> {
     return AppBarDropdown(
       primary: true,
       onSelected: onSelected,
-      values: _Title.values,
+      values: _FifeLab.values,
       title: 'Fife Lab',
     );
   }

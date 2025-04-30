@@ -54,6 +54,8 @@ class FifeLab extends ConsumerWidget with FifeLabRouter {
                 textTheme: ButtonTextTheme.primary,
               ),
               inputDecorationTheme: const InputDecorationTheme(
+                contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                isDense: true,
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.blue),
                 ),
@@ -78,6 +80,9 @@ class FifeLab extends ConsumerWidget with FifeLabRouter {
                 bodyMedium: TextStyle(color: Colors.white), // for e.g. smaller text
                 bodySmall: TextStyle(color: Colors.white),
               ),
+              iconTheme: const IconThemeData(
+                color: Colors.green,
+              ),
               useMaterial3: true,
             ),
           ColorTheme.light => ThemeData(
@@ -85,6 +90,14 @@ class FifeLab extends ConsumerWidget with FifeLabRouter {
                 color: Color(0xff1f004a),
                 foregroundColor: Colors.white,
               ),
+              inputDecorationTheme: const InputDecorationTheme(
+                contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                isDense: true, // Makes the field more compact
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.blue),
+                ),
+              ),
+              useMaterial3: true,
             ),
         },
         routerConfig: router,

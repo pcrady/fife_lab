@@ -1,5 +1,6 @@
 import 'package:fife_lab/lib/app_logger.dart';
 import 'package:fife_lab/providers/server_controller.dart';
+import 'package:fife_lab/providers/settings.dart';
 import 'package:fife_lab/widgets/fife_lab_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,6 +40,13 @@ class _MainScreenContent extends ConsumerStatefulWidget {
 class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
   @override
   Widget build(BuildContext context) {
+    final settingsData = ref.watch(settingsProvider);
+    final settings = settingsData.when(
+      data: (data) => data,
+      error: (_, __) => null,
+      loading: () => null,
+    );
+
     return Stack(
       children: [
         Opacity(
@@ -48,6 +56,14 @@ class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
             child: Scaffold(
               appBar: FifeLabAppBar(),
               body: Container(),
+              bottomNavigationBar: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Text(settings?.projectsDirPath ?? 'None'),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -59,9 +75,7 @@ class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      'Connecting To Sever..',
-                    ),
+                    Text('Connecting To Sever..'),
                     SizedBox(height: 8.0),
                     SizedBox(width: 200, child: LinearProgressIndicator()),
                   ],
