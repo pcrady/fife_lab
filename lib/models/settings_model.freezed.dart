@@ -17,7 +17,7 @@ T _$identity<T>(T value) => value;
 mixin _$SettingsModel {
   ColorTheme get theme;
   String? get projectsDirPath;
-  String? get projectPath;
+  String? get projectName;
 
   /// Create a copy of SettingsModel
   /// with the given fields replaced by the non-null parameter values.
@@ -38,18 +38,18 @@ mixin _$SettingsModel {
             (identical(other.theme, theme) || other.theme == theme) &&
             (identical(other.projectsDirPath, projectsDirPath) ||
                 other.projectsDirPath == projectsDirPath) &&
-            (identical(other.projectPath, projectPath) ||
-                other.projectPath == projectPath));
+            (identical(other.projectName, projectName) ||
+                other.projectName == projectName));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, theme, projectsDirPath, projectPath);
+      Object.hash(runtimeType, theme, projectsDirPath, projectName);
 
   @override
   String toString() {
-    return 'SettingsModel(theme: $theme, projectsDirPath: $projectsDirPath, projectPath: $projectPath)';
+    return 'SettingsModel(theme: $theme, projectsDirPath: $projectsDirPath, projectName: $projectName)';
   }
 }
 
@@ -59,7 +59,7 @@ abstract mixin class $SettingsModelCopyWith<$Res> {
           SettingsModel value, $Res Function(SettingsModel) _then) =
       _$SettingsModelCopyWithImpl;
   @useResult
-  $Res call({ColorTheme theme, String? projectsDirPath, String? projectPath});
+  $Res call({ColorTheme theme, String? projectsDirPath, String? projectName});
 }
 
 /// @nodoc
@@ -77,7 +77,7 @@ class _$SettingsModelCopyWithImpl<$Res>
   $Res call({
     Object? theme = null,
     Object? projectsDirPath = freezed,
-    Object? projectPath = freezed,
+    Object? projectName = freezed,
   }) {
     return _then(_self.copyWith(
       theme: null == theme
@@ -88,9 +88,9 @@ class _$SettingsModelCopyWithImpl<$Res>
           ? _self.projectsDirPath
           : projectsDirPath // ignore: cast_nullable_to_non_nullable
               as String?,
-      projectPath: freezed == projectPath
-          ? _self.projectPath
-          : projectPath // ignore: cast_nullable_to_non_nullable
+      projectName: freezed == projectName
+          ? _self.projectName
+          : projectName // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
   }
@@ -100,9 +100,10 @@ class _$SettingsModelCopyWithImpl<$Res>
 
 @JsonSerializable(
     fieldRename: FieldRename.snake, explicitToJson: true, includeIfNull: false)
-class _SettingsModel implements SettingsModel {
+class _SettingsModel extends SettingsModel {
   const _SettingsModel(
-      {this.theme = ColorTheme.dark, this.projectsDirPath, this.projectPath});
+      {this.theme = ColorTheme.dark, this.projectsDirPath, this.projectName})
+      : super._();
   factory _SettingsModel.fromJson(Map<String, dynamic> json) =>
       _$SettingsModelFromJson(json);
 
@@ -112,7 +113,7 @@ class _SettingsModel implements SettingsModel {
   @override
   final String? projectsDirPath;
   @override
-  final String? projectPath;
+  final String? projectName;
 
   /// Create a copy of SettingsModel
   /// with the given fields replaced by the non-null parameter values.
@@ -137,18 +138,18 @@ class _SettingsModel implements SettingsModel {
             (identical(other.theme, theme) || other.theme == theme) &&
             (identical(other.projectsDirPath, projectsDirPath) ||
                 other.projectsDirPath == projectsDirPath) &&
-            (identical(other.projectPath, projectPath) ||
-                other.projectPath == projectPath));
+            (identical(other.projectName, projectName) ||
+                other.projectName == projectName));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, theme, projectsDirPath, projectPath);
+      Object.hash(runtimeType, theme, projectsDirPath, projectName);
 
   @override
   String toString() {
-    return 'SettingsModel(theme: $theme, projectsDirPath: $projectsDirPath, projectPath: $projectPath)';
+    return 'SettingsModel(theme: $theme, projectsDirPath: $projectsDirPath, projectName: $projectName)';
   }
 }
 
@@ -160,7 +161,7 @@ abstract mixin class _$SettingsModelCopyWith<$Res>
       __$SettingsModelCopyWithImpl;
   @override
   @useResult
-  $Res call({ColorTheme theme, String? projectsDirPath, String? projectPath});
+  $Res call({ColorTheme theme, String? projectsDirPath, String? projectName});
 }
 
 /// @nodoc
@@ -178,7 +179,7 @@ class __$SettingsModelCopyWithImpl<$Res>
   $Res call({
     Object? theme = null,
     Object? projectsDirPath = freezed,
-    Object? projectPath = freezed,
+    Object? projectName = freezed,
   }) {
     return _then(_SettingsModel(
       theme: null == theme
@@ -189,9 +190,9 @@ class __$SettingsModelCopyWithImpl<$Res>
           ? _self.projectsDirPath
           : projectsDirPath // ignore: cast_nullable_to_non_nullable
               as String?,
-      projectPath: freezed == projectPath
-          ? _self.projectPath
-          : projectPath // ignore: cast_nullable_to_non_nullable
+      projectName: freezed == projectName
+          ? _self.projectName
+          : projectName // ignore: cast_nullable_to_non_nullable
               as String?,
     ));
   }

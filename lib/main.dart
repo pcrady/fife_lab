@@ -54,25 +54,29 @@ class FifeLab extends ConsumerWidget with FifeLabRouter {
                 textTheme: ButtonTextTheme.primary,
               ),
               inputDecorationTheme: const InputDecorationTheme(
-                contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
                 isDense: true,
+                border: OutlineInputBorder(), // Default border
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey),
+                ),
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.blue),
                 ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: unselectedColor),
-                ),
                 labelStyle: TextStyle(color: unselectedColor),
                 hintStyle: TextStyle(color: unselectedColor),
-                focusColor: Colors.blue,
+                //focusColor: Colors.blue,
               ),
-              dialogTheme: const DialogTheme(
+              dialogTheme: DialogTheme(
+                backgroundColor: Colors.white12,
                 titleTextStyle: TextStyle(
                   color: Colors.white,
                   fontSize: 24.0,
                 ),
                 contentTextStyle: TextStyle(
                   color: Colors.white,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
               ),
               textTheme: const TextTheme(
@@ -91,8 +95,12 @@ class FifeLab extends ConsumerWidget with FifeLabRouter {
                 foregroundColor: Colors.white,
               ),
               inputDecorationTheme: const InputDecorationTheme(
-                contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                isDense: true, // Makes the field more compact
+                //contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                isDense: true,
+                border: OutlineInputBorder(), // Default border
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey),
+                ),
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.blue),
                 ),

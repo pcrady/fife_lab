@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:fife_lab/lib/app_logger.dart';
 import 'package:fife_lab/lib/initializer.dart';
 import 'package:fife_lab/models/settings_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:path/path.dart' as path;
 
 part 'settings.g.dart';
 
@@ -56,9 +58,34 @@ class Settings extends _$Settings {
   Future<void> setProjectsDir({
     required String projectsDirPath,
   }) async {
+    final exists = await Directory(projectsDirPath).exists();
+    if (!exists) {
+      throw 'Project Directory: $projectsDirPath does not exist.';
+    }
     final previousState = await future;
     final newState = previousState.copyWith(projectsDirPath: projectsDirPath);
     await _writeStateToDisk(newState);
     state = AsyncData(newState);
+  }
+
+  Future<void> setProject({
+    required String projectName,
+  }) async {
+    final previousState = await future;
+    final newState = previousState.copyWith(projectName: projectName);
+    await _writeStateToDisk(newState);
+    state = AsyncData(newState);
+
+    final projectsDirPath = newState.projectsDirPath;
+
+    if (projectsDirPath != null) {
+      final exists = await Directory(projectsDirPath).exists();
+      if (!exists) {
+        throw 'Project Directory: $projectsDirPath does not exist.';
+      }
+
+      final projectDir = Directory(path.join(projectsDirPath, newState.projectName));
+      projectDir.create(recursive: true);
+    }
   }
 }

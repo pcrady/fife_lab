@@ -60,16 +60,21 @@ class _LogfileReaderState extends State<LogfileReader> with TickerProviderStateM
   }
 
   Future<List<String>> _readFile() async {
-    await Initializer.initialised.future;
-    late String logPath;
-    if (widget.logType == LogType.serverLogs) {
-      assert(Initializer.serverLogPath != null);
-      logPath = Initializer.serverLogPath!;
-    } else {
-      assert(Initializer.appLogPath != null);
-      logPath = Initializer.appLogPath!;
+    try {
+      await Initializer.initialised.future;
+      late String logPath;
+      if (widget.logType == LogType.serverLogs) {
+        assert(Initializer.serverLogPath != null);
+        logPath = Initializer.serverLogPath!;
+      } else {
+        assert(Initializer.appLogPath != null);
+        logPath = Initializer.appLogPath!;
+      }
+      return await Isolate.run(() => reverseAsync(logPath));
+    } catch (err, stack) {
+      AppLogger.e(err, stackTrace: stack);
+      rethrow;
     }
-    return await Isolate.run(() => reverseAsync(logPath));
   }
 
   @override

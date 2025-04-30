@@ -41,7 +41,7 @@ class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
   @override
   Widget build(BuildContext context) {
     final settingsData = ref.watch(settingsProvider);
-    final settings = settingsData.when(
+    final settingsModel = settingsData.when(
       data: (data) => data,
       error: (_, __) => null,
       loading: () => null,
@@ -60,7 +60,7 @@ class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
                   children: [
-                    Text(settings?.projectsDirPath ?? 'None'),
+                    Text(settingsModel?.currentProjectDir?.path ?? ''),
                   ],
                 ),
               ),

@@ -1,7 +1,7 @@
+import 'package:fife_lab/lib/app_logger.dart';
 import 'package:fife_lab/models/settings_model.dart';
 import 'package:fife_lab/providers/settings.dart';
 import 'package:fife_lab/widgets/dropdown_buttons/app_bar_dropdown.dart';
-import 'package:fife_lab/widgets/fife_lab_dialog.dart';
 import 'package:fife_lab/widgets/logfile_reader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,104 +29,32 @@ class FifeLabDropdown extends ConsumerStatefulWidget {
 }
 
 class _TitleDropdownState extends ConsumerState<FifeLabDropdown> {
-  void onSelected(_FifeLab choice) async {
+  void onSelected(_FifeLab choice) {
     switch (choice) {
       case _FifeLab.about:
-        {
-          FifeLabDialog.showDialogWrapper(
-            title: 'About',
-            content: _AboutContent(),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close'),
-              ),
-            ],
-            context: context,
-          );
-        }
+        showDialog(
+          context: context,
+          builder: (_) => const _AboutDialog(),
+        );
+        break;
       case _FifeLab.preferences:
-        {
-          FifeLabDialog.showDialogWrapper(
-            title: 'Preferences',
-            content: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Color Theme'),
-                StatefulBuilder(builder: (BuildContext context, StateSetter setState) {
-                  final theme = ref.watch(settingsProvider).when(
-                        data: (data) => data.theme,
-                        error: (_, __) => ColorTheme.dark,
-                        loading: () => ColorTheme.dark,
-                      );
-
-                  return ToggleButtons(
-                    isSelected: [theme == ColorTheme.light, theme == ColorTheme.dark],
-                    onPressed: (int index) async {
-                      final notifier = ref.read(settingsProvider.notifier);
-                      if (index == 0) {
-                        await notifier.setColorTheme(colorTheme: ColorTheme.light);
-                      } else {
-                        await notifier.setColorTheme(colorTheme: ColorTheme.dark);
-                      }
-                      setState(() {});
-                    },
-                    borderRadius: BorderRadius.circular(4),
-                    children: const [
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 12),
-                        child: Icon(
-                          Icons.sunny,
-                          size: 20,
-                          color: Colors.amber,
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 12),
-                        child: Icon(
-                          Icons.dark_mode,
-                          size: 20,
-                          color: Colors.pink,
-                        ),
-                      ),
-                    ],
-                  );
-                }),
-              ],
-            ),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close'),
-              ),
-            ],
-            context: context,
-          );
-        }
+        showDialog(
+          context: context,
+          builder: (_) => const _PreferencesDialog(),
+        );
+        break;
       case _FifeLab.serverLogs:
-        FifeLabDialog.showDialogWrapper(
-          title: 'Server Logs',
-          content: LogfileReader(logType: LogType.serverLogs),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Close'),
-            ),
-          ],
+        showDialog(
           context: context,
+          builder: (_) => const _ServerLogs(),
         );
+        break;
       case _FifeLab.appLogs:
-        FifeLabDialog.showDialogWrapper(
-          title: 'App Logs',
-          content: LogfileReader(logType: LogType.appLogs),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Close'),
-            ),
-          ],
+        showDialog(
           context: context,
+          builder: (_) => const _AppLogs(),
         );
+        break;
     }
   }
 
@@ -141,28 +69,135 @@ class _TitleDropdownState extends ConsumerState<FifeLabDropdown> {
   }
 }
 
-class _AboutContent extends StatelessWidget {
-  const _AboutContent({super.key});
+class _AppLogs extends StatelessWidget {
+  const _AppLogs({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: PackageInfo.fromPlatform(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return Container();
-        }
-        final packageInfo = snapshot.data;
-        return SelectionArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return AlertDialog(
+      title: Text('App Logs'),
+      content: LogfileReader(logType: LogType.appLogs),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Close'),
+        ),
+      ],
+    );
+  }
+}
+
+class _ServerLogs extends StatelessWidget {
+  const _ServerLogs({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Server Logs'),
+      content: LogfileReader(logType: LogType.serverLogs),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Close'),
+        ),
+      ],
+    );
+  }
+}
+
+
+
+class _AboutDialog extends StatelessWidget {
+  const _AboutDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('About'),
+      content: FutureBuilder(
+        future: PackageInfo.fromPlatform(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Container();
+          }
+          final packageInfo = snapshot.data;
+          return SelectionArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('App Name: ${packageInfo?.appName ?? 'Error'}'),
+                Text('Version: ${packageInfo?.version ?? 'Error'}'),
+                Text('Build Number: ${packageInfo?.buildNumber ?? 'Error'}'),
+              ],
+            ),
+          );
+        },
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Close'),
+        ),
+      ],
+    );
+  }
+}
+
+class _PreferencesDialog extends ConsumerWidget {
+  const _PreferencesDialog({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asyncSettings = ref.watch(settingsProvider);
+
+    return asyncSettings.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (_, __) => const Text('Failed to load settings'),
+      data: (settings) {
+        final theme = settings.theme;
+        return AlertDialog(
+          title: const Text('Preferences'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          content: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('App Name: ${packageInfo?.appName ?? 'Error'}'),
-              Text('Version: ${packageInfo?.version ?? 'Error'}'),
-              Text('Build Number: ${packageInfo?.buildNumber ?? 'Error'}'),
+              const Text('Color Theme'),
+              ToggleButtons(
+                isSelected: [
+                  theme == ColorTheme.light,
+                  theme == ColorTheme.dark,
+                ],
+                onPressed: (i) async {
+                  final value = i == 0 ? ColorTheme.light : ColorTheme.dark;
+                  try {
+                    ref.read(settingsProvider.notifier).setColorTheme(colorTheme: value);
+                  } catch (err, stack) {
+                    AppLogger.e(err, stackTrace: stack);
+                  }
+                },
+                borderRadius: BorderRadius.circular(4),
+                children: const [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: Icon(Icons.sunny, size: 20, color: Colors.amber),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: Icon(Icons.dark_mode, size: 20, color: Colors.pink),
+                  ),
+                ],
+              ),
             ],
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+          ],
         );
       },
     );

@@ -1,10 +1,7 @@
 import 'dart:io';
-
 import 'package:fife_lab/lib/app_logger.dart';
-import 'package:fife_lab/models/settings_model.dart';
 import 'package:fife_lab/providers/settings.dart';
 import 'package:fife_lab/widgets/dropdown_buttons/app_bar_dropdown.dart';
-import 'package:fife_lab/widgets/fife_lab_dialog.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -34,19 +31,11 @@ class _FileDropdownState extends ConsumerState<FileDropdown> {
   void onSelected(_Selection selection) {
     switch (selection) {
       case _Selection.newProject:
-        {
-          FifeLabDialog.showDialogWrapper(
-            title: 'New Project',
-            content: _NewProject(),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close'),
-              ),
-            ],
-            context: context,
-          );
-        }
+        showDialog(
+          context: context,
+          builder: (_) => const _NewProjectDialog(),
+        );
+        break;
       case _Selection.openProject:
         // TODO: Handle this case.
         throw UnimplementedError();
@@ -69,30 +58,41 @@ class _FileDropdownState extends ConsumerState<FileDropdown> {
   }
 }
 
-class _NewProject extends ConsumerStatefulWidget {
-  const _NewProject({super.key});
+class _NewProjectDialog extends ConsumerStatefulWidget {
+  const _NewProjectDialog({super.key});
 
   @override
-  ConsumerState<_NewProject> createState() => _NewProjectState();
+  ConsumerState<_NewProjectDialog> createState() => _NewProjectDialogState();
 }
 
-class _NewProjectState extends ConsumerState<_NewProject> {
+class _NewProjectDialogState extends ConsumerState<_NewProjectDialog> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _projectDirController;
+  late final TextEditingController _projectNameController;
   bool _projectsDirExists = false;
 
   @override
   void initState() {
     _projectDirController = TextEditingController();
+    _projectNameController = TextEditingController();
+    _projectNameController.addListener(() => setState(() {}));
 
     _projectDirController.addListener(() async {
-      final exists = await Directory(_projectDirController.text).exists();
-      setState(() => _projectsDirExists = exists);
+      try {
+        final exists = await Directory(_projectDirController.text).exists();
+        setState(() => _projectsDirExists = exists);
+      } catch (err, stack) {
+        AppLogger.e(err, stackTrace: stack);
+      }
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final settings = await ref.read(settingsProvider.future);
-      _projectDirController.text = settings.projectsDirPath ?? 'None';
+      try {
+        final settings = await ref.read(settingsProvider.future);
+        _projectDirController.text = settings.projectsDirPath ?? 'None';
+      } catch (err, stack) {
+        AppLogger.e(err, stackTrace: stack);
+      }
     });
     super.initState();
   }
@@ -100,53 +100,86 @@ class _NewProjectState extends ConsumerState<_NewProject> {
   @override
   void dispose() {
     _projectDirController.dispose();
+    _projectNameController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 1200,
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                Text('Projects Directory: '),
-                Expanded(
-                  child: TextFormField(
-                    controller: _projectDirController,
-                    decoration: InputDecoration(
-                      hintText: 'Enter a message',
-                      suffixIcon: IconButton(
-                        onPressed: () async {
-                          try {
-                            // TODO this requires further config
-                            String? projectsDirPath = await FilePicker.platform.getDirectoryPath(
-                              dialogTitle: 'Select Your Projects Directory',
-                            );
-                            if (projectsDirPath != null) {
-                              await ref.read(settingsProvider.notifier).setProjectsDir(projectsDirPath: projectsDirPath);
-                            }
-                          } catch (err, stack) {
-                            AppLogger.e(err, stackTrace: stack);
-                          }
-                        },
-                        icon: Icon(Icons.keyboard_arrow_down),
-                      ),
-                    ),
+    return AlertDialog(
+      title: Text('New Project'),
+      content: SizedBox(
+        width: 600,
+        height: 160,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextFormField(
+                controller: _projectDirController,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                validator: (_) {
+                  return _projectsDirExists ? null : 'Projects Directory does not Exist';
+                },
+                decoration: InputDecoration(
+                  hintText: 'Enter a directory to store your projects',
+                  label: Text('Projects Directory'),
+                  suffixIcon: IconButton(
+                    onPressed: () async {
+                      try {
+                        final settingsModel = await ref.read(settingsProvider.future);
+                        String? projectsDirPath = await FilePicker.platform.getDirectoryPath(
+                          dialogTitle: 'Select Your Projects Directory',
+                          initialDirectory: settingsModel.projectsDirPath,
+                        );
+                        if (projectsDirPath != null) {
+                          final settings = ref.read(settingsProvider.notifier);
+                          await settings.setProjectsDir(projectsDirPath: projectsDirPath);
+                          _projectDirController.text = projectsDirPath;
+                        }
+                      } catch (err, stack) {
+                        AppLogger.e(err, stackTrace: stack);
+                      }
+                    },
+                    icon: Icon(Icons.keyboard_arrow_down),
                   ),
-                )
-              ],
-            ),
-            Row(
-              children: [Text(_projectsDirExists ? 'Exists' : 'Does not Exist')],
-            ),
-          ],
+                ),
+              ),
+              SizedBox(height: 16),
+              TextFormField(
+                controller: _projectNameController,
+                decoration: InputDecoration(
+                  hintText: 'Enter a name for your project',
+                  label: Text('Project Name'),
+                ),
+              ),
+              SizedBox(height: 16),
+              Text('Project Path: ${_projectDirController.text}/${_projectNameController.text}'),
+            ],
+          ),
         ),
       ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Close'),
+        ),
+        TextButton(
+          onPressed: () async {
+            try {
+              final settings = ref.read(settingsProvider.notifier);
+              await settings.setProjectsDir(projectsDirPath: _projectDirController.text);
+              await settings.setProject(projectName: _projectNameController.text);
+            } catch (err, stack) {
+              AppLogger.e(err, stackTrace: stack);
+            }
+            Navigator.of(context).pop();
+          },
+          child: const Text('Create'),
+        ),
+      ],
     );
   }
 }

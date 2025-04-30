@@ -11,7 +11,7 @@ _SettingsModel _$SettingsModelFromJson(Map<String, dynamic> json) =>
       theme: $enumDecodeNullable(_$ColorThemeEnumMap, json['theme']) ??
           ColorTheme.dark,
       projectsDirPath: json['projects_dir_path'] as String?,
-      projectPath: json['project_path'] as String?,
+      projectName: json['project_name'] as String?,
     );
 
 Map<String, dynamic> _$SettingsModelToJson(_SettingsModel instance) =>
@@ -19,7 +19,7 @@ Map<String, dynamic> _$SettingsModelToJson(_SettingsModel instance) =>
       'theme': _$ColorThemeEnumMap[instance.theme]!,
       if (instance.projectsDirPath case final value?)
         'projects_dir_path': value,
-      if (instance.projectPath case final value?) 'project_path': value,
+      if (instance.projectName case final value?) 'project_name': value,
     };
 
 const _$ColorThemeEnumMap = {
