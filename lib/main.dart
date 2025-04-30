@@ -54,6 +54,7 @@ class FifeLab extends ConsumerWidget with FifeLabRouter {
                 textTheme: ButtonTextTheme.primary,
               ),
               inputDecorationTheme: const InputDecorationTheme(
+                suffixIconColor: Colors.greenAccent,
                 isDense: true,
                 border: OutlineInputBorder(), // Default border
                 enabledBorder: OutlineInputBorder(

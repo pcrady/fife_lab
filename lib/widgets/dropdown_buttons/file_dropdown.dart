@@ -37,8 +37,11 @@ class _FileDropdownState extends ConsumerState<FileDropdown> {
         );
         break;
       case _Selection.openProject:
-        // TODO: Handle this case.
-        throw UnimplementedError();
+        showDialog(
+          context: context,
+          builder: (_) => const _OpenProjectDialog(),
+        );
+        break;
       case _Selection.addImages:
         // TODO: Handle this case.
         throw UnimplementedError();
@@ -67,19 +70,19 @@ class _NewProjectDialog extends ConsumerStatefulWidget {
 
 class _NewProjectDialogState extends ConsumerState<_NewProjectDialog> {
   final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _projectDirController;
+  late final TextEditingController _projectsDirController;
   late final TextEditingController _projectNameController;
   bool _projectsDirExists = false;
 
   @override
   void initState() {
-    _projectDirController = TextEditingController();
+    _projectsDirController = TextEditingController();
     _projectNameController = TextEditingController();
     _projectNameController.addListener(() => setState(() {}));
 
-    _projectDirController.addListener(() async {
+    _projectsDirController.addListener(() async {
       try {
-        final exists = await Directory(_projectDirController.text).exists();
+        final exists = await Directory(_projectsDirController.text).exists();
         setState(() => _projectsDirExists = exists);
       } catch (err, stack) {
         AppLogger.e(err, stackTrace: stack);
@@ -89,7 +92,7 @@ class _NewProjectDialogState extends ConsumerState<_NewProjectDialog> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
         final settings = await ref.read(settingsProvider.future);
-        _projectDirController.text = settings.projectsDirPath ?? 'None';
+        _projectsDirController.text = settings.projectsDirPath ?? 'None';
       } catch (err, stack) {
         AppLogger.e(err, stackTrace: stack);
       }
@@ -99,7 +102,7 @@ class _NewProjectDialogState extends ConsumerState<_NewProjectDialog> {
 
   @override
   void dispose() {
-    _projectDirController.dispose();
+    _projectsDirController.dispose();
     _projectNameController.dispose();
     super.dispose();
   }
@@ -118,7 +121,7 @@ class _NewProjectDialogState extends ConsumerState<_NewProjectDialog> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextFormField(
-                controller: _projectDirController,
+                controller: _projectsDirController,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 validator: (_) {
                   return _projectsDirExists ? null : 'Projects Directory does not Exist';
@@ -137,7 +140,7 @@ class _NewProjectDialogState extends ConsumerState<_NewProjectDialog> {
                         if (projectsDirPath != null) {
                           final settings = ref.read(settingsProvider.notifier);
                           await settings.setProjectsDir(projectsDirPath: projectsDirPath);
-                          _projectDirController.text = projectsDirPath;
+                          _projectsDirController.text = projectsDirPath;
                         }
                       } catch (err, stack) {
                         AppLogger.e(err, stackTrace: stack);
@@ -156,7 +159,7 @@ class _NewProjectDialogState extends ConsumerState<_NewProjectDialog> {
                 ),
               ),
               SizedBox(height: 16),
-              Text('Project Path: ${_projectDirController.text}/${_projectNameController.text}'),
+              Text('Project Path: ${_projectsDirController.text}/${_projectNameController.text}'),
             ],
           ),
         ),
@@ -168,14 +171,55 @@ class _NewProjectDialogState extends ConsumerState<_NewProjectDialog> {
         ),
         TextButton(
           onPressed: () async {
-            try {
-              final settings = ref.read(settingsProvider.notifier);
-              await settings.setProjectsDir(projectsDirPath: _projectDirController.text);
-              await settings.setProject(projectName: _projectNameController.text);
-            } catch (err, stack) {
+            if (_formKey.currentState!.validate()) {
+              try {
+                final settings = ref.read(settingsProvider.notifier);
+                await settings.setProjectsDir(projectsDirPath: _projectsDirController.text);
+                await settings.setProject(projectName: _projectNameController.text);
+              } catch (err, stack) {
+                AppLogger.e(err, stackTrace: stack);
+              }
+              if (context.mounted) {
+                Navigator.of(context).pop();
+              }
+            }
+          },
+          child: const Text('Create'),
+        ),
+      ],
+    );
+  }
+}
+
+class _OpenProjectDialog extends ConsumerStatefulWidget {
+  const _OpenProjectDialog({super.key});
+
+  @override
+  ConsumerState createState() => __OpenProjectDialogState();
+}
+
+class __OpenProjectDialogState extends ConsumerState<_OpenProjectDialog> {
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Open Project'),
+      content: SizedBox(
+        width: 600,
+        height: 160,
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Close'),
+        ),
+        TextButton(
+          onPressed: () async {
+            try {} catch (err, stack) {
               AppLogger.e(err, stackTrace: stack);
             }
-            Navigator.of(context).pop();
+            if (context.mounted) {
+              Navigator.of(context).pop();
+            }
           },
           child: const Text('Create'),
         ),
