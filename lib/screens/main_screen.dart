@@ -1,4 +1,5 @@
 import 'package:fife_lab/lib/app_logger.dart';
+import 'package:fife_lab/providers/project_watcher.dart';
 import 'package:fife_lab/providers/server_controller.dart';
 import 'package:fife_lab/providers/settings.dart';
 import 'package:fife_lab/widgets/fife_lab_app_bar.dart';
@@ -40,8 +41,12 @@ class _MainScreenContent extends ConsumerStatefulWidget {
 class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
   @override
   Widget build(BuildContext context) {
-    final settingsData = ref.watch(settingsProvider);
-    final settingsModel = settingsData.when(
+    final settingsModel =  ref.watch(settingsProvider).when(
+      data: (data) => data,
+      error: (_, __) => null,
+      loading: () => null,
+    );
+    final projectWatcherEvents = ref.watch(projectWatcherProvider).when(
       data: (data) => data,
       error: (_, __) => null,
       loading: () => null,

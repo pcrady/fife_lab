@@ -1,6 +1,7 @@
 import 'package:fife_lab/lib/fife_lab_router.dart';
 import 'package:fife_lab/lib/initializer.dart';
 import 'package:fife_lab/models/settings_model.dart';
+import 'package:fife_lab/providers/project_watcher.dart';
 import 'package:fife_lab/providers/server_controller.dart';
 import 'package:fife_lab/providers/settings.dart';
 import 'package:flutter/material.dart';
@@ -125,6 +126,8 @@ class _EagerInitialization extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(serverControllerProvider);
+    ref.watch(settingsProvider);
+    ref.watch(projectWatcherProvider);
     return child;
   }
 }
