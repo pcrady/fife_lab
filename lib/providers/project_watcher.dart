@@ -64,7 +64,6 @@ class ProjectWatcher extends _$ProjectWatcher {
               final settings = ref.read(settingsProvider.notifier);
               if (event.path == settingsModel.projectPath) {
                 assert(settingsModel.projectsPath != null);
-                AppLogger.w(event);
                 settings.setProject(
                   projectsPath: settingsModel.projectsPath,
                   projectName: null,
@@ -88,7 +87,6 @@ class ProjectWatcher extends _$ProjectWatcher {
         if (event is FileSystemDeleteEvent) {
           final settings = ref.read(settingsProvider.notifier);
           if (event.path == settingsModel.projectsPath) {
-            AppLogger.f(event);
             settings.setProject(
               projectsPath: null,
               projectName: null,

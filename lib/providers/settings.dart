@@ -24,9 +24,7 @@ class Settings extends _$Settings {
 
       if (settingsString == null) {
         await Initializer.initialised.future;
-        settingsModel = SettingsModel(
-          projectsPath: Initializer.projectsDir?.path,
-        );
+        settingsModel = SettingsModel(projectsPath: Initializer.projectsDir?.path);
         await _writeStateToDisk(settingsModel);
       } else {
         final settingsModelMap = jsonDecode(settingsString);
@@ -35,6 +33,16 @@ class Settings extends _$Settings {
     } catch (err) {
       AppLogger.e(err);
       rethrow;
+    }
+
+    if (!await settingsModel.projectDirExists) {
+      settingsModel = settingsModel.copyWith(projectName: null);
+      await _writeStateToDisk(settingsModel);
+    }
+
+    if (!await settingsModel.projectsDirExists) {
+      settingsModel = settingsModel.copyWith(projectsPath: null);
+      await _writeStateToDisk(settingsModel);
     }
 
     return settingsModel;
@@ -59,12 +67,10 @@ class Settings extends _$Settings {
     String? projectsPath,
     String? projectName,
   }) async {
-    AppLogger.i('$projectsPath \n$projectName');
     assert(
       !(projectsPath == null && projectName != null),
       'Cannot set a project name without a directory.',
     );
-
 
     if (projectsPath != null) {
       final projectsDir = Directory(projectsPath);

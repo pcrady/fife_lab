@@ -30,5 +30,8 @@ abstract class SettingsModel with _$SettingsModel {
   Directory? get projectsDir => projectsPath != null ? Directory(projectsPath!) : null;
   Directory? get projectDir => projectPath != null ? Directory(projectPath!) : null;
 
+  Future<bool> get projectsDirExists async => await projectsDir?.exists() ?? false;
+  Future<bool> get projectDirExists async => await projectDir?.exists() ?? false;
+
   factory SettingsModel.fromJson(Map<String, dynamic> json) => _$SettingsModelFromJson(json);
 }
