@@ -5,6 +5,7 @@ import 'package:fife_lab/widgets/dropdown_buttons/app_bar_dropdown.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path/path.dart' as path;
 
 enum _Selection {
   newProject('New Project'),
@@ -92,7 +93,7 @@ class _NewProjectDialogState extends ConsumerState<_NewProjectDialog> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
         final settings = await ref.read(settingsProvider.future);
-        _projectsDirController.text = settings.projectsDirPath ?? 'None';
+        _projectsDirController.text = settings.projectsPath ?? 'None';
       } catch (err, stack) {
         AppLogger.e(err, stackTrace: stack);
       }
@@ -135,7 +136,7 @@ class _NewProjectDialogState extends ConsumerState<_NewProjectDialog> {
                         final settingsModel = await ref.read(settingsProvider.future);
                         String? projectsDirPath = await FilePicker.platform.getDirectoryPath(
                           dialogTitle: 'Select Your Projects Directory',
-                          initialDirectory: settingsModel.projectsDirPath,
+                          initialDirectory: settingsModel.projectsPath,
                         );
                         if (projectsDirPath != null) {
                           _projectsDirController.text = projectsDirPath;
@@ -175,8 +176,10 @@ class _NewProjectDialogState extends ConsumerState<_NewProjectDialog> {
             if (_formKey.currentState!.validate()) {
               try {
                 final settings = ref.read(settingsProvider.notifier);
-                await settings.setProjectsDir(projectsDir: Directory(_projectsDirController.text));
-                await settings.setProjectName(projectName: _projectNameController.text);
+                await settings.setProject(
+                  projectsPath: _projectsDirController.text,
+                  projectName: _projectNameController.text,
+                );
               } catch (err, stack) {
                 AppLogger.e(err, stackTrace: stack);
               }
@@ -193,7 +196,7 @@ class _NewProjectDialogState extends ConsumerState<_NewProjectDialog> {
 }
 
 class _OpenProjectDialog extends ConsumerStatefulWidget {
-  const _OpenProjectDialog({super.key});
+  const _OpenProjectDialog();
 
   @override
   ConsumerState createState() => __OpenProjectDialogState();
@@ -220,7 +223,7 @@ class __OpenProjectDialogState extends ConsumerState<_OpenProjectDialog> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
         final settings = await ref.read(settingsProvider.future);
-        _projectDirController.text = settings.currentProjectDir?.path ?? 'None';
+        _projectDirController.text = settings.projectPath ?? 'None';
       } catch (err, stack) {
         AppLogger.e(err, stackTrace: stack);
       }
@@ -263,7 +266,7 @@ class __OpenProjectDialogState extends ConsumerState<_OpenProjectDialog> {
                         final settingsModel = await ref.read(settingsProvider.future);
                         String? projectsDirPath = await FilePicker.platform.getDirectoryPath(
                           dialogTitle: 'Select Project Directory',
-                          initialDirectory: settingsModel.projectsDirPath,
+                          initialDirectory: settingsModel.projectsPath,
                         );
                         if (projectsDirPath != null) {
                           _projectDirController.text = projectsDirPath;
@@ -290,7 +293,11 @@ class __OpenProjectDialogState extends ConsumerState<_OpenProjectDialog> {
             if (_formKey.currentState!.validate()) {
               try {
                 final settings = ref.read(settingsProvider.notifier);
-                await settings.setProjectDir(projectDir: Directory(_projectDirController.text));
+                final projectDir = Directory(_projectDirController.text);
+                await settings.setProject(
+                  projectsPath: projectDir.parent.path,
+                  projectName: path.basename(projectDir.path),
+                );
               } catch (err, stack) {
                 AppLogger.e(err, stackTrace: stack);
               }

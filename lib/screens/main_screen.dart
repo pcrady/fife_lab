@@ -41,16 +41,16 @@ class _MainScreenContent extends ConsumerStatefulWidget {
 class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
   @override
   Widget build(BuildContext context) {
-    final settingsModel =  ref.watch(settingsProvider).when(
-      data: (data) => data,
-      error: (_, __) => null,
-      loading: () => null,
-    );
+    final settingsModel = ref.watch(settingsProvider).when(
+          data: (data) => data,
+          error: (_, __) => null,
+          loading: () => null,
+        );
     final projectWatcherEvents = ref.watch(projectWatcherProvider).when(
-      data: (data) => data,
-      error: (_, __) => null,
-      loading: () => null,
-    );
+          data: (data) => data,
+          error: (_, __) => null,
+          loading: () => null,
+        );
 
     return Stack(
       children: [
@@ -60,12 +60,19 @@ class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
             ignoring: widget.locked,
             child: Scaffold(
               appBar: FifeLabAppBar(),
-              body: Container(),
+              body: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Project Path:  ${settingsModel?.projectPath ?? 'NONE'}'),
+                  Text('Projects Path: ${settingsModel?.projectsPath ?? 'NONE'}'),
+                ],
+              ),
               bottomNavigationBar: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
                   children: [
-                    Text(settingsModel?.currentProjectDir?.path ?? ''),
+                    Text(settingsModel?.projectPath ?? ''),
                   ],
                 ),
               ),

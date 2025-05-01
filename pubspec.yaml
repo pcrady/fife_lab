@@ -25,6 +25,7 @@ dependencies:
   json_annotation: ^4.9.0
   shared_preferences: ^2.5.3
   file_picker: ^10.1.2
+  rxdart: ^0.28.0
 
 dev_dependencies:
   flutter_test:

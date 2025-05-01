@@ -25,7 +25,7 @@ class Settings extends _$Settings {
       if (settingsString == null) {
         await Initializer.initialised.future;
         settingsModel = SettingsModel(
-          projectsDirPath: Initializer.projectsDir?.path,
+          projectsPath: Initializer.projectsDir?.path,
         );
         await _writeStateToDisk(settingsModel);
       } else {
@@ -55,51 +55,35 @@ class Settings extends _$Settings {
     state = AsyncData(newState);
   }
 
-  Future<void> setProjectsDir({
-    required Directory projectsDir,
+  Future<void> setProject({
+    String? projectsPath,
+    String? projectName,
   }) async {
-    if (!await projectsDir.exists()) {
-      throw 'Project Directory: ${projectsDir.path} does not exist.';
-    }
-    final previousState = await future;
-    final newState = previousState.copyWith(projectsDirPath: projectsDir.path);
-    await _writeStateToDisk(newState);
-    state = AsyncData(newState);
-  }
+    AppLogger.i('$projectsPath \n$projectName');
+    assert(
+      !(projectsPath == null && projectName != null),
+      'Cannot set a project name without a directory.',
+    );
 
-  Future<void> setProjectName({
-    required String projectName,
-  }) async {
-    final previousState = await future;
-    final newState = previousState.copyWith(projectName: projectName);
-    await _writeStateToDisk(newState);
-    state = AsyncData(newState);
 
-    final projectsDirPath = newState.projectsDirPath;
-
-    if (projectsDirPath != null) {
-      final exists = await Directory(projectsDirPath).exists();
-      if (!exists) {
-        throw 'Project Directory: $projectsDirPath does not exist.';
+    if (projectsPath != null) {
+      final projectsDir = Directory(projectsPath);
+      if (!await projectsDir.exists()) {
+        throw Exception('Project directory does not exist: ${projectsDir.path}');
       }
 
-      final projectDir = Directory(path.join(projectsDirPath, newState.projectName));
-      projectDir.create(recursive: true);
+      if (projectName != null) {
+        await Directory(path.join(projectsDir.path, projectName)).create(recursive: true);
+      }
     }
-  }
 
-  Future<void> setProjectDir({
-    required Directory projectDir,
-  }) async {
-    final projectName = path.basename(projectDir.path);
-    final projectsDirPath = projectDir.parent.path;
-
-    final previousState = await future;
-    final newState = previousState.copyWith(
-      projectsDirPath: projectsDirPath,
+    final prev = await future;
+    final updated = prev.copyWith(
+      projectsPath: projectsPath,
       projectName: projectName,
     );
-    await _writeStateToDisk(newState);
-    state = AsyncData(newState);
+
+    await _writeStateToDisk(updated);
+    state = AsyncData(updated);
   }
 }

@@ -16,17 +16,19 @@ abstract class SettingsModel with _$SettingsModel {
   @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true, includeIfNull: false)
   const factory SettingsModel({
     @Default(ColorTheme.dark) ColorTheme theme,
-    String? projectsDirPath,
+    String? projectsPath,
     String? projectName,
   }) = _SettingsModel;
 
-  Directory? get currentProjectDir {
-    if (projectsDirPath == null || projectName == null) {
+  String? get projectPath {
+    if (projectsPath == null || projectName == null) {
       return null;
     }
-    final projectPath = path.join(projectsDirPath!, projectName);
-    return Directory(projectPath);
+    return path.join(projectsPath!, projectName);
   }
+
+  Directory? get projectsDir => projectsPath != null ? Directory(projectsPath!) : null;
+  Directory? get projectDir => projectPath != null ? Directory(projectPath!) : null;
 
   factory SettingsModel.fromJson(Map<String, dynamic> json) => _$SettingsModelFromJson(json);
 }
