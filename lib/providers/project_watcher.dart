@@ -8,52 +8,51 @@ import 'package:rxdart/rxdart.dart';
 
 part 'project_watcher.g.dart';
 
-enum FifeLabEvent {
-  projectDirNotFound,
-  projectDirGood,
-  projectsDirNotFound,
-  projectsDirGood,
+enum ProjectStatus {
+  healthy,
+  noSelection,
+  notFound,
 }
 
 @riverpod
 class ProjectWatcher extends _$ProjectWatcher {
+  StreamSubscription<ProjectStatus>? _projectEventSubscription;
+  StreamSubscription<ProjectStatus>? _projectEventsSubscription;
+
   @override
-  Stream<FifeLabEvent> build() async* {
+  Stream<ProjectStatus> build() async* {
     final settings = await ref.watch(settingsProvider.future);
-    AppLogger.i('building ----------------');
+    AppLogger.e(settings.toJson());
 
-    if (await settings.projectDirExists) {
-      yield FifeLabEvent.projectDirGood;
-    } else {
-      yield FifeLabEvent.projectDirNotFound;
+    final projectDirExists = await settings.projectDirExists;
+    final projectPath =  settings.projectPath;
+    final projectsPath =  settings.projectsPath;
+
+    if (!projectDirExists && projectPath != null) {
+      yield ProjectStatus.notFound;
       return;
     }
 
-    if (await settings.projectsDirExists) {
-      yield FifeLabEvent.projectsDirGood;
-    } else {
-      yield FifeLabEvent.projectsDirNotFound;
-      return;
+    if (projectDirExists && projectPath != null) {
+      yield ProjectStatus.healthy;
     }
-
-    final projectPath = settings.projectPath;
-    final projectsPath = settings.projectsPath;
-
-    assert(projectPath != null);
-    assert(projectsPath != null);
 
     if (projectPath == null) {
-      throw 'projectPath is null. This should not be possible';
+      yield ProjectStatus.noSelection;
+      return;
     }
 
     if (projectsPath == null) {
-      throw 'projectsPath is null. This should not be possible';
+      yield ProjectStatus.noSelection;
+      return;
     }
+
 
     final projectEvents = _projectFifeLabEventStream(
       stream: Directory(projectPath).watch(recursive: true),
       settingsModel: settings,
     );
+
     final projectsEvents = _projectsFifeLabEventStream(
       stream: Directory(projectsPath).watch(),
       settingsModel: settings,
@@ -62,7 +61,7 @@ class ProjectWatcher extends _$ProjectWatcher {
     yield* MergeStream([projectEvents, projectsEvents]);
   }
 
-  Stream<FifeLabEvent> _projectFifeLabEventStream({
+  Stream<ProjectStatus> _projectFifeLabEventStream({
     required Stream<FileSystemEvent> stream,
     SettingsModel? settingsModel,
   }) async* {
@@ -78,11 +77,12 @@ class ProjectWatcher extends _$ProjectWatcher {
               final settings = ref.read(settingsProvider.notifier);
               if (event.path == settingsModel.projectPath) {
                 assert(settingsModel.projectsPath != null); // maybe problematic
-                settings.setProject(
+                AppLogger.f(settingsModel.toJson());
+                await settings.setProject(
                   projectsPath: settingsModel.projectsPath,
                   projectName: null,
                 );
-                yield FifeLabEvent.projectDirNotFound;
+                yield ProjectStatus.notFound;
               }
             }
             break;
@@ -93,7 +93,7 @@ class ProjectWatcher extends _$ProjectWatcher {
     }
   }
 
-  Stream<FifeLabEvent> _projectsFifeLabEventStream({
+  Stream<ProjectStatus> _projectsFifeLabEventStream({
     required Stream<FileSystemEvent> stream,
     SettingsModel? settingsModel,
   }) async* {
@@ -102,12 +102,10 @@ class ProjectWatcher extends _$ProjectWatcher {
         if (event is FileSystemDeleteEvent) {
           final settings = ref.read(settingsProvider.notifier);
           if (event.path == settingsModel.projectsPath) {
-            settings.setProject(
+            await settings.setProject(
               projectsPath: null,
               projectName: null,
             );
-            AppLogger.f('YYYYY');
-            yield FifeLabEvent.projectsDirNotFound;
           }
         }
       }

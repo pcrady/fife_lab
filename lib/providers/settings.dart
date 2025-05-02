@@ -84,10 +84,12 @@ class Settings extends _$Settings {
     }
 
     final prev = await future;
+    AppLogger.i(prev.toJson());
     final updated = prev.copyWith(
       projectsPath: projectsPath,
       projectName: projectName,
     );
+    AppLogger.w(updated.toJson());
 
     await _writeStateToDisk(updated);
     state = AsyncData(updated);

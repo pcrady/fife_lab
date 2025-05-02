@@ -49,6 +49,8 @@ class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
           loading: () => null,
         );
 
+    AppLogger.i(settingsModel?.toJson());
+
     final event = ref.watch(projectWatcherProvider).when(
           data: (data) {
             AppLogger.f(data);
