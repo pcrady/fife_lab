@@ -17,6 +17,7 @@ class Settings extends _$Settings {
   @override
   Future<SettingsModel> build() async {
     late SettingsModel settingsModel;
+    AppLogger.f('THIS SHOULD NOT HAPPEN');
 
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -84,12 +85,10 @@ class Settings extends _$Settings {
     }
 
     final prev = await future;
-    AppLogger.i(prev.toJson());
     final updated = prev.copyWith(
       projectsPath: projectsPath,
       projectName: projectName,
     );
-    AppLogger.w(updated.toJson());
 
     await _writeStateToDisk(updated);
     state = AsyncData(updated);

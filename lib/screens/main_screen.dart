@@ -49,13 +49,8 @@ class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
           loading: () => null,
         );
 
-    AppLogger.i(settingsModel?.toJson());
-
     final event = ref.watch(projectWatcherProvider).when(
-          data: (data) {
-            AppLogger.f(data);
-            return data;
-          },
+          data: (data) => data,
           error: (err, stack) {
             AppLogger.f(err, stackTrace: stack);
             return null;
@@ -82,6 +77,13 @@ class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
                     width: 200,
                     color: Colors.red,
                   ),
+                  TextButton(
+                    onPressed: () async {
+                      final fuck = await ref.read(settingsProvider.future);
+                      AppLogger.i(fuck.toJson());
+                    },
+                    child: Text('check state'),
+                  ),
                 ],
               ),
               bottomNavigationBar: Container(
@@ -92,6 +94,18 @@ class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('Project Path: ${settingsModel?.projectPath ?? 'None'}'),
+                      switch (event) {
+                        null => Container(),
+                        ProjectStatus.healthy => Text(
+                            'Healthy',
+                            style: TextStyle(color: Colors.greenAccent),
+                          ),
+                        ProjectStatus.noSelection => Text('No Project Selected'),
+                        ProjectStatus.notFound => Text(
+                            'Project Not Found',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                      }
                     ],
                   ),
                 ),
