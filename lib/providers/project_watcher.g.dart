@@ -6,12 +6,12 @@ part of 'project_watcher.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$projectWatcherHash() => r'36dd9b98c0f769941d0996a725c8741b84bdfec2';
+String _$projectWatcherHash() => r'12be0dd72e3a03bb62e314fc0e54402084fec60a';
 
 /// See also [ProjectWatcher].
 @ProviderFor(ProjectWatcher)
 final projectWatcherProvider =
-    AutoDisposeStreamNotifierProvider<ProjectWatcher, FileSystemEvent>.internal(
+    AutoDisposeStreamNotifierProvider<ProjectWatcher, FifeLabEvent>.internal(
   ProjectWatcher.new,
   name: r'projectWatcherProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -21,6 +21,6 @@ final projectWatcherProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$ProjectWatcher = AutoDisposeStreamNotifier<FileSystemEvent>;
+typedef _$ProjectWatcher = AutoDisposeStreamNotifier<FifeLabEvent>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

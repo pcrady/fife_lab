@@ -38,11 +38,21 @@ class FifeLab extends ConsumerWidget with FifeLabRouter {
         title: 'Fife Image',
         theme: switch (theme) {
           ColorTheme.dark => ThemeData(
+            useMaterial3: true,
               colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurpleAccent),
               elevatedButtonTheme: ElevatedButtonThemeData(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
-                  foregroundColor: Colors.white,
+                  foregroundColor: Colors.green,
+                ),
+              ),
+              textButtonTheme: TextButtonThemeData(
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.green,
+                ),
+              ),
+              outlinedButtonTheme: OutlinedButtonThemeData(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.green,
                 ),
               ),
               appBarTheme: const AppBarTheme(
@@ -50,14 +60,10 @@ class FifeLab extends ConsumerWidget with FifeLabRouter {
                 foregroundColor: Colors.white,
               ),
               scaffoldBackgroundColor: const Color(0xff101418),
-              buttonTheme: const ButtonThemeData(
-                buttonColor: Colors.deepPurple,
-                textTheme: ButtonTextTheme.primary,
-              ),
               inputDecorationTheme: const InputDecorationTheme(
                 suffixIconColor: Colors.greenAccent,
                 isDense: true,
-                border: OutlineInputBorder(), // Default border
+                border: OutlineInputBorder(),
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.grey),
                 ),
@@ -66,10 +72,9 @@ class FifeLab extends ConsumerWidget with FifeLabRouter {
                 ),
                 labelStyle: TextStyle(color: unselectedColor),
                 hintStyle: TextStyle(color: unselectedColor),
-                //focusColor: Colors.blue,
               ),
               dialogTheme: DialogTheme(
-                backgroundColor: Colors.white12,
+                backgroundColor: Color(0xFF1e112b),
                 titleTextStyle: TextStyle(
                   color: Colors.white,
                   fontSize: 24.0,
@@ -82,14 +87,13 @@ class FifeLab extends ConsumerWidget with FifeLabRouter {
                 ),
               ),
               textTheme: const TextTheme(
-                bodyLarge: TextStyle(color: Colors.white), // for Text()
-                bodyMedium: TextStyle(color: Colors.white), // for e.g. smaller text
+                bodyLarge: TextStyle(color: Colors.white),
+                bodyMedium: TextStyle(color: Colors.white),
                 bodySmall: TextStyle(color: Colors.white),
               ),
               iconTheme: const IconThemeData(
                 color: Colors.green,
               ),
-              useMaterial3: true,
             ),
           ColorTheme.light => ThemeData(
               appBarTheme: const AppBarTheme(
@@ -97,9 +101,8 @@ class FifeLab extends ConsumerWidget with FifeLabRouter {
                 foregroundColor: Colors.white,
               ),
               inputDecorationTheme: const InputDecorationTheme(
-                //contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 isDense: true,
-                border: OutlineInputBorder(), // Default border
+                border: OutlineInputBorder(),
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.grey),
                 ),

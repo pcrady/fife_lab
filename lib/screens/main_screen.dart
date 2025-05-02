@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fife_lab/lib/app_logger.dart';
 import 'package:fife_lab/providers/project_watcher.dart';
 import 'package:fife_lab/providers/server_controller.dart';
@@ -46,9 +48,16 @@ class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
           error: (_, __) => null,
           loading: () => null,
         );
-    final projectWatcherEvents = ref.watch(projectWatcherProvider).when(
-          data: (data) => data,
-          error: (_, __) => null,
+
+    final event = ref.watch(projectWatcherProvider).when(
+          data: (data) {
+            AppLogger.f(data);
+            return data;
+          },
+          error: (err, stack) {
+            AppLogger.f(err, stackTrace: stack);
+            return null;
+          },
           loading: () => null,
         );
 
@@ -66,14 +75,23 @@ class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
                 children: [
                   Text('Project Path:  ${settingsModel?.projectPath ?? 'NONE'}'),
                   Text('Projects Path: ${settingsModel?.projectsPath ?? 'NONE'}'),
+                  Container(
+                    height: 200,
+                    width: 200,
+                    color: Colors.red,
+                  ),
                 ],
               ),
-              bottomNavigationBar: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Text(settingsModel?.projectPath ?? ''),
-                  ],
+              bottomNavigationBar: Container(
+                color: Theme.of(context).appBarTheme.backgroundColor,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Project Path: ${settingsModel?.projectPath ?? 'None'}'),
+                    ],
+                  ),
                 ),
               ),
             ),
