@@ -18,6 +18,7 @@ mixin _$SettingsModel {
   ColorTheme get theme;
   String? get projectsPath;
   String? get projectName;
+  FifeLabFunction get function;
 
   /// Create a copy of SettingsModel
   /// with the given fields replaced by the non-null parameter values.
@@ -39,17 +40,19 @@ mixin _$SettingsModel {
             (identical(other.projectsPath, projectsPath) ||
                 other.projectsPath == projectsPath) &&
             (identical(other.projectName, projectName) ||
-                other.projectName == projectName));
+                other.projectName == projectName) &&
+            (identical(other.function, function) ||
+                other.function == function));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, theme, projectsPath, projectName);
+      Object.hash(runtimeType, theme, projectsPath, projectName, function);
 
   @override
   String toString() {
-    return 'SettingsModel(theme: $theme, projectsPath: $projectsPath, projectName: $projectName)';
+    return 'SettingsModel(theme: $theme, projectsPath: $projectsPath, projectName: $projectName, function: $function)';
   }
 }
 
@@ -59,7 +62,11 @@ abstract mixin class $SettingsModelCopyWith<$Res> {
           SettingsModel value, $Res Function(SettingsModel) _then) =
       _$SettingsModelCopyWithImpl;
   @useResult
-  $Res call({ColorTheme theme, String? projectsPath, String? projectName});
+  $Res call(
+      {ColorTheme theme,
+      String? projectsPath,
+      String? projectName,
+      FifeLabFunction function});
 }
 
 /// @nodoc
@@ -78,6 +85,7 @@ class _$SettingsModelCopyWithImpl<$Res>
     Object? theme = null,
     Object? projectsPath = freezed,
     Object? projectName = freezed,
+    Object? function = null,
   }) {
     return _then(_self.copyWith(
       theme: null == theme
@@ -92,6 +100,10 @@ class _$SettingsModelCopyWithImpl<$Res>
           ? _self.projectName
           : projectName // ignore: cast_nullable_to_non_nullable
               as String?,
+      function: null == function
+          ? _self.function
+          : function // ignore: cast_nullable_to_non_nullable
+              as FifeLabFunction,
     ));
   }
 }
@@ -102,7 +114,10 @@ class _$SettingsModelCopyWithImpl<$Res>
     fieldRename: FieldRename.snake, explicitToJson: true, includeIfNull: false)
 class _SettingsModel extends SettingsModel {
   const _SettingsModel(
-      {this.theme = ColorTheme.dark, this.projectsPath, this.projectName})
+      {this.theme = ColorTheme.dark,
+      this.projectsPath,
+      this.projectName,
+      this.function = FifeLabFunction.general})
       : super._();
   factory _SettingsModel.fromJson(Map<String, dynamic> json) =>
       _$SettingsModelFromJson(json);
@@ -114,6 +129,9 @@ class _SettingsModel extends SettingsModel {
   final String? projectsPath;
   @override
   final String? projectName;
+  @override
+  @JsonKey()
+  final FifeLabFunction function;
 
   /// Create a copy of SettingsModel
   /// with the given fields replaced by the non-null parameter values.
@@ -139,17 +157,19 @@ class _SettingsModel extends SettingsModel {
             (identical(other.projectsPath, projectsPath) ||
                 other.projectsPath == projectsPath) &&
             (identical(other.projectName, projectName) ||
-                other.projectName == projectName));
+                other.projectName == projectName) &&
+            (identical(other.function, function) ||
+                other.function == function));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode =>
-      Object.hash(runtimeType, theme, projectsPath, projectName);
+      Object.hash(runtimeType, theme, projectsPath, projectName, function);
 
   @override
   String toString() {
-    return 'SettingsModel(theme: $theme, projectsPath: $projectsPath, projectName: $projectName)';
+    return 'SettingsModel(theme: $theme, projectsPath: $projectsPath, projectName: $projectName, function: $function)';
   }
 }
 
@@ -161,7 +181,11 @@ abstract mixin class _$SettingsModelCopyWith<$Res>
       __$SettingsModelCopyWithImpl;
   @override
   @useResult
-  $Res call({ColorTheme theme, String? projectsPath, String? projectName});
+  $Res call(
+      {ColorTheme theme,
+      String? projectsPath,
+      String? projectName,
+      FifeLabFunction function});
 }
 
 /// @nodoc
@@ -180,6 +204,7 @@ class __$SettingsModelCopyWithImpl<$Res>
     Object? theme = null,
     Object? projectsPath = freezed,
     Object? projectName = freezed,
+    Object? function = null,
   }) {
     return _then(_SettingsModel(
       theme: null == theme
@@ -194,6 +219,10 @@ class __$SettingsModelCopyWithImpl<$Res>
           ? _self.projectName
           : projectName // ignore: cast_nullable_to_non_nullable
               as String?,
+      function: null == function
+          ? _self.function
+          : function // ignore: cast_nullable_to_non_nullable
+              as FifeLabFunction,
     ));
   }
 }

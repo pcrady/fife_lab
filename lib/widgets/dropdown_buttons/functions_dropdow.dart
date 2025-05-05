@@ -1,3 +1,5 @@
+import 'package:fife_lab/functions/fife_lab_function.dart';
+import 'package:fife_lab/providers/settings.dart';
 import 'package:fife_lab/widgets/dropdown_buttons/app_bar_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,11 +24,14 @@ class FunctionsDropdown extends ConsumerStatefulWidget {
 }
 
 class _FunctionsDropdownState extends ConsumerState<FunctionsDropdown> {
-  void onSelected(_Function function) {
+  void onSelected(_Function function) async {
+    final settings = ref.read(settingsProvider.notifier);
     switch (function) {
       case _Function.general:
+        await settings.setFunction(function: FifeLabFunction.general);
         break;
       case _Function.convexHull:
+        await settings.setFunction(function: FifeLabFunction.convexHull);
         break;
     }
   }

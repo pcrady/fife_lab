@@ -15,13 +15,15 @@ enum ProjectStatus {
 class ProjectWatcher extends _$ProjectWatcher {
   @override
   Stream<ProjectStatus> build() async* {
+    ref.watch(settingsProvider.selectAsync((settings) => settings.projectPath));
+    ref.watch(settingsProvider.selectAsync((settings) => settings.projectsPath));
     yield* _projectDirectoryPoller();
   }
 
   Stream<ProjectStatus> _projectDirectoryPoller() async* {
     while (true) {
       await Future.delayed(const Duration(seconds: 1));
-      final settings = await ref.watch(settingsProvider.future);
+      final settings = await ref.read(settingsProvider.future);
       final projectPath = settings.projectPath;
       final projectsPath = settings.projectsPath;
       final projectDirExists = await settings.projectDirExists;

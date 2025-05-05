@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'package:fife_lab/functions/convex_hull/convex_hull.dart';
+import 'package:fife_lab/functions/fife_lab_function.dart';
+import 'package:fife_lab/functions/general/general.dart';
 import 'package:fife_lab/lib/app_logger.dart';
 import 'package:fife_lab/providers/project_watcher.dart';
 import 'package:fife_lab/providers/server_controller.dart';
@@ -66,26 +69,11 @@ class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
             ignoring: widget.locked,
             child: Scaffold(
               appBar: FifeLabAppBar(),
-              body: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Project Path:  ${settingsModel?.projectPath ?? 'NONE'}'),
-                  Text('Projects Path: ${settingsModel?.projectsPath ?? 'NONE'}'),
-                  Container(
-                    height: 200,
-                    width: 200,
-                    color: Colors.red,
-                  ),
-                  TextButton(
-                    onPressed: () async {
-                      final fuck = await ref.read(settingsProvider.future);
-                      AppLogger.i(fuck.toJson());
-                    },
-                    child: Text('check state'),
-                  ),
-                ],
-              ),
+              body: switch (settingsModel?.function) {
+                null => Container(),
+                FifeLabFunction.general => General(),
+                FifeLabFunction.convexHull => ConvexHull(),
+              },
               bottomNavigationBar: Container(
                 color: Theme.of(context).appBarTheme.backgroundColor,
                 height: 40,

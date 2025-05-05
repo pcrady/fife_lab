@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:fife_lab/functions/fife_lab_function.dart';
 import 'package:fife_lab/lib/app_logger.dart';
 import 'package:fife_lab/lib/initializer.dart';
 import 'package:fife_lab/models/settings_model.dart';
@@ -48,6 +49,15 @@ class Settings extends _$Settings {
   }) async {
     final previousState = await future;
     final newState = previousState.copyWith(theme: colorTheme);
+    await _writeStateToDisk(newState);
+    state = AsyncData(newState);
+  }
+
+  Future<void> setFunction({
+    required FifeLabFunction function,
+  }) async {
+    final previousState = await future;
+    final newState = previousState.copyWith(function: function);
     await _writeStateToDisk(newState);
     state = AsyncData(newState);
   }

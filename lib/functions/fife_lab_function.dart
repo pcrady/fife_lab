@@ -1,0 +1,4 @@
+enum FifeLabFunction {
+  general,
+  convexHull,
+}

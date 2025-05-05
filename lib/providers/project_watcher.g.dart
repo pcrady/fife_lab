@@ -6,7 +6,7 @@ part of 'project_watcher.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$projectWatcherHash() => r'12be0dd72e3a03bb62e314fc0e54402084fec60a';
+String _$projectWatcherHash() => r'd753b28a9b0a006fe86ee26ae28a83280b112f58';
 
 /// See also [ProjectWatcher].
 @ProviderFor(ProjectWatcher)

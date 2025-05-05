@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:fife_lab/functions/fife_lab_function.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:path/path.dart' as path;
 part 'settings_model.freezed.dart';
@@ -18,6 +19,7 @@ abstract class SettingsModel with _$SettingsModel {
     @Default(ColorTheme.dark) ColorTheme theme,
     String? projectsPath,
     String? projectName,
+    @Default(FifeLabFunction.general) FifeLabFunction function,
   }) = _SettingsModel;
 
   String? get projectPath {
