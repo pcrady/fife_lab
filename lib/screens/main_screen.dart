@@ -88,6 +88,7 @@ class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
               ),
               bottomNavigationBar: Container(
                 color: Theme.of(context).appBarTheme.backgroundColor,
+                height: 40,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
@@ -100,8 +101,12 @@ class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
                             'Healthy',
                             style: TextStyle(color: Colors.greenAccent),
                           ),
-                        ProjectStatus.noSelection => Text('No Project Selected'),
-                        ProjectStatus.notFound => Text(
+                        ProjectStatus.noProjectSelected => Text('No Project Selected'),
+                        ProjectStatus.projectsDirNotFound => Text(
+                            'Projects Directory Not Found',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ProjectStatus.projectNotFound => Text(
                             'Project Not Found',
                             style: TextStyle(color: Colors.red),
                           ),
