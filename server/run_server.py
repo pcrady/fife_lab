@@ -7,7 +7,6 @@ import time
 import threading
 import logging
 import socket
-import ctypes
 
 server_process: subprocess.Popen | None = None
 
@@ -31,7 +30,7 @@ def start_gunicorn() -> None:
         [
             f"{dir_path}/kill_with_parent.sh",
             f"{dir_path}/fife_lab_env/bin/uvicorn",
-            "main:app",
+            "app.main:app",
             "--host", HOST,
             "--port", PORT,
             "--workers", "4",
