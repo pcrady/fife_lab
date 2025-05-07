@@ -2,9 +2,6 @@
 conda activate ./fife_lab_env
 conda deactivate
 
-# To run:
-gunicorn main:app -b 127.0.0.1:5000 --log-level debug
-
 # To create environment file
 conda env export > environment_${macos | windows}.yml
 

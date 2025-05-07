@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
+import 'package:fife_lab/constants.dart';
 import 'package:fife_lab/functions/convex_hull/convex_hull.dart';
 import 'package:fife_lab/functions/fife_lab_function.dart';
 import 'package:fife_lab/functions/general/general.dart';
@@ -89,7 +91,10 @@ class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
                             'Healthy',
                             style: TextStyle(color: Colors.greenAccent),
                           ),
-                        ProjectStatus.noProjectSelected => Text('No Project Selected'),
+                        ProjectStatus.noProjectSelected => Text(
+                          'No Project Selected',
+                          style: TextStyle(color: Colors.yellow),
+                        ),
                         ProjectStatus.projectsDirNotFound => Text(
                             'Projects Directory Not Found',
                             style: TextStyle(color: Colors.red),
@@ -98,6 +103,11 @@ class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
                             'Project Not Found',
                             style: TextStyle(color: Colors.red),
                           ),
+                        // TODO: Handle this case.
+                        ProjectStatus.noServerConnection => Text(
+                          'Unable to Connect to Server Workers',
+                          style: TextStyle(color: Colors.red),
+                        ),
                       }
                     ],
                   ),

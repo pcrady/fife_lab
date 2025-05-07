@@ -9,6 +9,7 @@ enum ProjectStatus {
   projectNotFound,
   projectsDirNotFound,
   noProjectSelected,
+  noServerConnection,
 }
 
 @riverpod
@@ -22,6 +23,7 @@ class ProjectWatcher extends _$ProjectWatcher {
 
   Stream<ProjectStatus> _projectDirectoryPoller() async* {
     while (true) {
+      // TODO poll the servers to verify that the app is connected
       await Future.delayed(const Duration(seconds: 1));
       final settings = await ref.read(settingsProvider.future);
       final projectPath = settings.projectPath;

@@ -29,7 +29,7 @@ class FileDropdown extends ConsumerStatefulWidget {
 }
 
 class _FileDropdownState extends ConsumerState<FileDropdown> {
-  void onSelected(_Selection selection) {
+  void onSelected(_Selection selection) async {
     switch (selection) {
       case _Selection.newProject:
         showDialog(
@@ -44,10 +44,14 @@ class _FileDropdownState extends ConsumerState<FileDropdown> {
         );
         break;
       case _Selection.addImages:
-        // TODO: Handle this case.
-        throw UnimplementedError();
+        {
+          FilePickerResult? result = await FilePicker.platform.pickFiles(
+            allowMultiple: true,
+            withData: false,
+          );
+          if (result == null) return;
+        }
       case _Selection.exportProject:
-        // TODO: Handle this case.
         throw UnimplementedError();
     }
   }

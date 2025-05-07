@@ -1,3 +1,6 @@
+import 'package:dio/dio.dart';
+import 'package:fife_lab/constants.dart';
+import 'package:fife_lab/lib/app_logger.dart';
 import 'package:fife_lab/lib/fife_lab_router.dart';
 import 'package:fife_lab/lib/initializer.dart';
 import 'package:fife_lab/models/settings_model.dart';
@@ -38,7 +41,7 @@ class FifeLab extends ConsumerWidget with FifeLabRouter {
         title: 'Fife Image',
         theme: switch (theme) {
           ColorTheme.dark => ThemeData(
-            useMaterial3: true,
+              useMaterial3: true,
               colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurpleAccent),
               elevatedButtonTheme: ElevatedButtonThemeData(
                 style: ElevatedButton.styleFrom(
@@ -119,7 +122,7 @@ class FifeLab extends ConsumerWidget with FifeLabRouter {
   }
 }
 
-class _EagerInitialization extends ConsumerWidget {
+class _EagerInitialization extends ConsumerStatefulWidget {
   final Widget child;
 
   const _EagerInitialization({
@@ -127,10 +130,37 @@ class _EagerInitialization extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_EagerInitialization> createState() => _EagerInitializationState();
+}
+
+class _EagerInitializationState extends ConsumerState<_EagerInitialization> {
+  @override
+  void initState() {
+    ref.listenManual(
+      settingsProvider.future,
+      (previous, next) async {
+        final settingsModel = await next;
+        final dio = Dio(BaseOptions(baseUrl: kServer));
+        try {
+          final response = await dio.post(
+            '/config',
+            data: {'project_path': settingsModel.projectPath},
+          );
+          AppLogger.f(response.toString());
+        } catch (err, stack) {
+          AppLogger.e(err, stackTrace: stack);
+        }
+      },
+      fireImmediately: true,
+    );
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     ref.watch(serverControllerProvider);
     ref.watch(settingsProvider);
     ref.watch(projectWatcherProvider);
-    return child;
+    return widget.child;
   }
 }

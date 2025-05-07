@@ -1,19 +1,37 @@
 import logging
 import os
 import signal
-import math
-import random
-import sys
-import select
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from pydantic import BaseModel
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from contextlib import asynccontextmanager
+
+from filelock import FileLock
+from tinydb import TinyDB
+from tinydb.storages  import JSONStorage
+
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-app = FastAPI()
+DB_PATH = 'db.json'
+db_lock = FileLock(f"{DB_PATH}.lock")
 
+class Config(BaseModel):
+    project_path: str
+
+
+def stdout_print(message: str) -> None:
+    logger.info(f"WORKER pid: {os.getpid()} - {message}")
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    stdout_print("Initialized")
+    yield
+
+app = FastAPI(lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -22,29 +40,25 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-def stdout_print(message: str) -> None:
-    logger.info(f"WORKER pid: {os.getpid()} - {message}")
-
-@app.on_event("startup")
-async def start_watchdog() -> None:
-    stdout_print("Initialized")
-
-@app.get("/stress-test")
-async def stress_test():
-    total = 0
-    for i in range(1, 10_000_000):
-        total += math.sqrt(i) * math.sin(i) * math.cos(i)
-    stdout_print(f"Stress Test pid: {os.getpid()}")
-    return JSONResponse(content="hello")
-
-@app.get("/test")
-async def test():
-    num = random.random()
-    stdout_print(str(num))
-    return JSONResponse(content=num)
-
 @app.post("/shutdown")
 async def shutdown():
     stdout_print("Shutdown requested")
     os.kill(os.getppid(), signal.SIGTERM)
     return JSONResponse(content={"status": "shutting down..."})
+
+
+# seems to work
+@app.post("/config")
+async def set_config(config: Config):
+    try:
+        with db_lock:
+            db = TinyDB(DB_PATH, storage=JSONStorage)
+            id = db.insert(config.model_dump())
+        return {'doc_id': id}
+    except Exception as err:
+        err_str = str(err)
+        stdout_print(err_str)
+
+
+
+
