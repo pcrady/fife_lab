@@ -31,7 +31,7 @@ class _TestingScreenState extends ConsumerState<TestingScreen> {
       for (int i = 0; i < 10000; i++) {
         futures.add(dio.post(
           '/iotest',
-          data: {'test_type': 'io_test', 'value': 1},
+          data: {'test_type': 'rapid_io_test', 'value': 1},
         ));
       }
       Future.wait(futures);
