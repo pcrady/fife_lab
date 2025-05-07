@@ -46,5 +46,5 @@ app.*.map.json
 
 /server/fife_lab_env
 /server/__pycache__
-/server/db.json
-/server/db.json.lock
+/server/database/db.json
+/server/database/db.json.lock
