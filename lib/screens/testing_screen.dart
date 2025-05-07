@@ -49,7 +49,7 @@ class _TestingScreenState extends ConsumerState<TestingScreen> {
     try {
       final dio = Dio(BaseOptions(baseUrl: kServer));
       List<Future> futures = [];
-      for (int i = 0; i < 10000; i++) {
+      for (int i = 0; i < 1; i++) {
         futures.add(dio.post(
           '/iotest',
           data: {'test_type': 'io_test', 'value': 1},
