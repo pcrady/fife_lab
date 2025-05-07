@@ -1,9 +1,9 @@
 from pydantic import BaseModel, Field
 from typing import Literal
 
+
 CONFIG_KEY = 'config'
 IO_TEST_KEY = 'io_test'
-
 
 class Config(BaseModel):
     project_path: str

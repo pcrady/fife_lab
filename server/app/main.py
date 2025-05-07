@@ -7,7 +7,6 @@ from app.test_endpoints import router as test_router
 from app.endpoints import router as router
 
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     stdout_print("Initialized")

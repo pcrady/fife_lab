@@ -5,7 +5,6 @@ from filelock import FileLock
 from typing import Final
 
 
-
 DB_PATH: Final[Path] = Path('database').joinpath('db.json')
 db_lock = FileLock(f"{DB_PATH}.lock")
 
