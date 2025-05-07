@@ -14,48 +14,37 @@ class TestingScreen extends ConsumerStatefulWidget {
 }
 
 class _TestingScreenState extends ConsumerState<TestingScreen> {
-  bool _stressRunning = false;
-
-  // Toggles the stress loop on/off
-  void _toggleStress() {
-    setState(() {
-      _stressRunning = !_stressRunning;
-    });
-    if (_stressRunning) {
-      _startStress();
-    }
-  }
-
-  // Only runs while _stressRunning is true
-  Future<void> _startStress() async {
-    final dio = Dio(BaseOptions(baseUrl: kServer));
+  Future<void> _clearDataBase() async {
     try {
-      while (_stressRunning) {
-        final response = await dio.post(
-          '/config',
-          data: {'project_path': 'testingwhat'},
-        );
-        AppLogger.f(response.toString());
-        // optional small delay to avoid absolutely hammering the server:
-        // await Future.delayed(Duration(milliseconds: 10));
-      }
+      final dio = Dio(BaseOptions(baseUrl: kServer));
+      final response = await dio.post('/clear');
+      AppLogger.f(response.toString());
     } catch (err, stack) {
       AppLogger.e(err, stackTrace: stack);
     }
   }
 
-  // Only runs while _stressRunning is true
   Future<void> _ioTest() async {
     try {
       final dio = Dio(BaseOptions(baseUrl: kServer));
       List<Future> futures = [];
-      for (int i = 0; i < 1; i++) {
+      for (int i = 0; i < 10000; i++) {
         futures.add(dio.post(
           '/iotest',
           data: {'test_type': 'io_test', 'value': 1},
         ));
       }
       Future.wait(futures);
+    } catch (err, stack) {
+      AppLogger.e(err, stackTrace: stack);
+    }
+  }
+
+  Future<void> _getAll() async {
+    try {
+      final dio = Dio(BaseOptions(baseUrl: kServer));
+      final response = await dio.get('/all');
+      AppLogger.f(response.toString());
     } catch (err, stack) {
       AppLogger.e(err, stackTrace: stack);
     }
@@ -74,44 +63,21 @@ class _TestingScreenState extends ConsumerState<TestingScreen> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(
-                onPressed: () async {
-                  try {
-                    final dio = Dio(BaseOptions(baseUrl: kServer));
-                    final response = await dio.post('/clear');
-                    AppLogger.f(response.toString());
-                  } catch (err, stack) {
-                    AppLogger.e(err, stackTrace: stack);
-                  }
-                },
+                onPressed: _clearDataBase,
                 child: Text('Clear Database'),
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(
-                onPressed: _toggleStress,
-                child: Text(_stressRunning ? 'Stop Stress' : 'Start Stress'),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
                 onPressed: _ioTest,
-                child: Text('IO Test'),
+                child: Text('IO Test (Rapid Read, Modify Write)'),
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(
-                onPressed: () async {
-                  try {
-                    final dio = Dio(BaseOptions(baseUrl: kServer));
-                    final response = await dio.get('/all');
-                    AppLogger.f(response.toString());
-                  } catch (err, stack) {
-                    AppLogger.e(err, stackTrace: stack);
-                  }
-                },
+                onPressed: _getAll,
                 child: Text('All'),
               ),
             ),
