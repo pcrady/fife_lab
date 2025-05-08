@@ -11,9 +11,6 @@ class General extends ConsumerStatefulWidget {
 class _GeneralState extends ConsumerState<General> {
   @override
   Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: () {},
-      child: Text('Test'),
-    );
+    return Text('General');
   }
 }

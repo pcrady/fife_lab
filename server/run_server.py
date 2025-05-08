@@ -60,7 +60,7 @@ def socket_server():
     global connected
     HOST = '127.0.0.1'
     PORT = 8001
-    timer = threading.Timer(20, shutdown_gunicorn)
+    timer = threading.Timer(120, shutdown_gunicorn)
     timer.start()
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
