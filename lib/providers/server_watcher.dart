@@ -1,14 +1,13 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:fife_lab/constants.dart';
 import 'package:fife_lab/lib/app_logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'server_controller.g.dart';
+part 'server_watcher.g.dart';
 
 @riverpod
-class ServerController extends _$ServerController {
-  final String _serverIp = '127.0.0.1';
-  final int _serverPort = 8001;
+class ServerWatcher extends _$ServerWatcher {
   final _controller = StreamController<bool>.broadcast();
 
   @override
@@ -20,7 +19,7 @@ class ServerController extends _$ServerController {
   Future<void> connectToKeepAliveSocket() async {
     _controller.add(false);
     try {
-      final socket = await Socket.connect(_serverIp, _serverPort);
+      final socket = await Socket.connect(kHostIp, kControlPort);
       _controller.add(true);
       AppLogger.i('socket connection successful.');
 

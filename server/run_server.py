@@ -18,7 +18,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 def stdout_print(message: str) -> None:
-    logger.info(message) 
+    if 'heartbeat' not in message:
+        logger.info(message) 
 
 # TODO figure out what to do if the uvicorn server dies and or the script dies
 def start_gunicorn() -> None:

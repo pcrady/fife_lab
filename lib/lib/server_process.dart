@@ -1,9 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
-import 'package:dio/dio.dart';
-import 'package:fife_lab/constants.dart';
 import 'package:fife_lab/lib/app_logger.dart';
+import 'package:fife_lab/providers/worker_watcher.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 import 'package:path/path.dart' as path;
@@ -74,20 +73,6 @@ class ServerProcess {
     AppLogger.i(data.replaceFirst('\n', ''));
   }
 
-  static Future<bool> _serverIsUp() async {
-    try {
-      final dio = Dio(BaseOptions(baseUrl: kServer));
-      final response = await dio.get('/heartbeat');
-      if (response.data['status'] == 'alive') {
-        return true;
-      } else {
-        return false;
-      }
-    } catch (_) {
-      return false;
-    }
-  }
-
   static void _isolate(SendPort port) async {
     final isolateReceivePort = ReceivePort();
     port.send(isolateReceivePort.sendPort);
@@ -101,7 +86,7 @@ class ServerProcess {
         );
 
         while (true) {
-          if (await _serverIsUp()) {
+          if (await WorkerWatcher.workerIsUp()) {
             AppLogger.w('Server is already running. Cancelling process.');
             break;
           }

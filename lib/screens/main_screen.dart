@@ -1,35 +1,61 @@
-import 'dart:io';
-
-import 'package:dio/dio.dart';
-import 'package:fife_lab/constants.dart';
 import 'package:fife_lab/functions/convex_hull/convex_hull.dart';
 import 'package:fife_lab/functions/fife_lab_function.dart';
 import 'package:fife_lab/functions/general/general.dart';
 import 'package:fife_lab/lib/app_logger.dart';
 import 'package:fife_lab/providers/project_watcher.dart';
-import 'package:fife_lab/providers/server_controller.dart';
+import 'package:fife_lab/providers/server_watcher.dart';
 import 'package:fife_lab/providers/settings.dart';
+import 'package:fife_lab/providers/worker_watcher.dart';
 import 'package:fife_lab/widgets/fife_lab_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class MainScreen extends ConsumerWidget {
+class MainScreen extends ConsumerStatefulWidget {
   static const route = '/';
 
   const MainScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final serverControllerData = ref.watch(serverControllerProvider);
+  ConsumerState<MainScreen> createState() => _MainScreenState();
+}
 
-    return serverControllerData.when(
-      data: (data) => data ? _MainScreenContent() : _MainScreenContent(locked: true),
-      error: (err, stack) {
-        AppLogger.e(err, stackTrace: stack);
-        return _MainScreenContent(locked: true);
+class _MainScreenState extends ConsumerState<MainScreen> {
+  bool locked = true;
+
+  @override
+  void initState() {
+    ref.listenManual(
+      serverWatcherProvider.future,
+      (previous, next) async {
+        final serverIsUp = await next;
+        final shouldLock = !serverIsUp;
+
+        if (shouldLock != locked) {
+          setState(() => locked = shouldLock);
+        }
       },
-      loading: () => _MainScreenContent(locked: true),
+      fireImmediately: true,
     );
+
+    ref.listenManual(
+      workerWatcherProvider.future,
+      (previous, next) async {
+        final workerIsUp = await next;
+        final shouldLock = !workerIsUp;
+
+        if (shouldLock != locked) {
+          setState(() => locked = shouldLock);
+        }
+      },
+      fireImmediately: true,
+    );
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _MainScreenContent(locked: locked);
   }
 }
 
@@ -57,7 +83,7 @@ class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
     final event = ref.watch(projectWatcherProvider).when(
           data: (data) => data,
           error: (err, stack) {
-            AppLogger.f(err, stackTrace: stack);
+            AppLogger.e(err, stackTrace: stack);
             return null;
           },
           loading: () => null,
@@ -92,9 +118,9 @@ class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
                             style: TextStyle(color: Colors.greenAccent),
                           ),
                         ProjectStatus.noProjectSelected => Text(
-                          'No Project Selected',
-                          style: TextStyle(color: Colors.yellow),
-                        ),
+                            'No Project Selected',
+                            style: TextStyle(color: Colors.yellow),
+                          ),
                         ProjectStatus.projectsDirNotFound => Text(
                             'Projects Directory Not Found',
                             style: TextStyle(color: Colors.red),
@@ -103,11 +129,6 @@ class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
                             'Project Not Found',
                             style: TextStyle(color: Colors.red),
                           ),
-                        // TODO: Handle this case.
-                        ProjectStatus.noServerConnection => Text(
-                          'Unable to Connect to Server Workers',
-                          style: TextStyle(color: Colors.red),
-                        ),
                       }
                     ],
                   ),
