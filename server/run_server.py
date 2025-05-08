@@ -21,7 +21,6 @@ def stdout_print(message: str) -> None:
     if 'heartbeat' not in message:
         logger.info(message) 
 
-# TODO figure out what to do if the uvicorn server dies and or the script dies
 def start_gunicorn() -> None:
     HOST = "127.0.0.1"
     PORT = "8000"
