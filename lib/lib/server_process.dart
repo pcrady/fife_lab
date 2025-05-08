@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
 import 'package:fife_lab/lib/app_logger.dart';
-import 'package:fife_lab/providers/worker_watcher.dart';
+import 'package:fife_lab/providers/watchers/worker_watcher.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 import 'package:path/path.dart' as path;

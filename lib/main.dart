@@ -4,9 +4,9 @@ import 'package:fife_lab/lib/app_logger.dart';
 import 'package:fife_lab/lib/fife_lab_router.dart';
 import 'package:fife_lab/lib/initializer.dart';
 import 'package:fife_lab/models/settings_model.dart';
-import 'package:fife_lab/providers/project_watcher.dart';
-import 'package:fife_lab/providers/server_watcher.dart';
+import 'package:fife_lab/providers/watchers/project_watcher.dart';
 import 'package:fife_lab/providers/settings.dart';
+import 'package:fife_lab/providers/watchers/server_watcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
