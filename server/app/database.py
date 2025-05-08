@@ -3,7 +3,7 @@ from filelock import FileLock
 from typing import Final
 from tinydb import TinyDB, Query
 from tinydb.storages import JSONStorage
-from app.models import CONFIG_KEY, Config
+from app.models import CONFIG_KEY, Config, IOTest
 from app.app_logging import stdout_print
 
 
@@ -55,7 +55,7 @@ class ProjectDB:
 
 
     @staticmethod
-    def __get___db_lockfile():
+    def __get_db_lockfile():
         db_path = ProjectDB.__get_db_path()
         if not db_path:
             return None
@@ -67,7 +67,7 @@ class ProjectDB:
     @staticmethod
     def set_test_value(value: int):
         db_path: Final = ProjectDB.__get_db_path()
-        lockfile: Final = ProjectDB.__get___db_lockfile()
+        lockfile: Final = ProjectDB.__get_db_lockfile()
 
         if db_path is None or lockfile is None:
             return
@@ -77,3 +77,29 @@ class ProjectDB:
             stdout_print(db_path)
             q = Query()
             db.upsert({'key': 'value', 'value': value}, q.key == 'value')
+
+    @staticmethod
+    def io_test(io_test: IOTest):
+        db_path = ProjectDB.__get_db_path()
+        db_lock = ProjectDB.__get_db_lockfile()
+
+        if db_path is None or db_lock is None:
+            return
+
+        with db_lock:
+            db = TinyDB(db_path, storage=JSONStorage)
+            q = Query()
+            existing = db.search(q.key == io_test.key)
+            if not existing:
+                db.insert(io_test.model_dump())
+                return io_test.model_dump()
+            if len(existing) == 1:
+                item = IOTest(**existing[0])
+                item.value += io_test.value 
+                item.test_type = io_test.test_type
+
+                db.update(item.model_dump(), q.key == item.key)
+                return item.model_dump()
+            raise RuntimeError(f"Multiple records found for {io_test.key}")
+ 
+

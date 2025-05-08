@@ -34,7 +34,7 @@ class _TestingScreenState extends ConsumerState<TestingScreen> {
           data: {'test_type': 'rapid_io_test', 'value': 1},
         ));
       }
-      Future.wait(futures);
+      await Future.wait(futures);
     } catch (err, stack) {
       AppLogger.e(err, stackTrace: stack);
     }
