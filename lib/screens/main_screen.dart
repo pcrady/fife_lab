@@ -64,7 +64,6 @@ class _MainScreenContent extends ConsumerStatefulWidget {
 
   const _MainScreenContent({
     this.locked = false,
-    super.key,
   });
 
   @override

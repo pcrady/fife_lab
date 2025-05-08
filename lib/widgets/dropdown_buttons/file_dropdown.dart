@@ -67,7 +67,7 @@ class _FileDropdownState extends ConsumerState<FileDropdown> {
 }
 
 class _NewProjectDialog extends ConsumerStatefulWidget {
-  const _NewProjectDialog({super.key});
+  const _NewProjectDialog();
 
   @override
   ConsumerState<_NewProjectDialog> createState() => _NewProjectDialogState();

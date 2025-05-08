@@ -30,7 +30,7 @@ class AppLogger {
       ]),
     );
 
-    _logger.i('Logging to: ${logPath}/${latestFileName}');
+    _logger.i('Logging to: $logPath/$latestFileName');
     _completer.complete();
   }
 

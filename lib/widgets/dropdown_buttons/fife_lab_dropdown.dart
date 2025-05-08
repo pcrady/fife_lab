@@ -70,7 +70,7 @@ class _TitleDropdownState extends ConsumerState<FifeLabDropdown> {
 }
 
 class _AppLogs extends StatelessWidget {
-  const _AppLogs({super.key});
+  const _AppLogs();
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +88,7 @@ class _AppLogs extends StatelessWidget {
 }
 
 class _ServerLogs extends StatelessWidget {
-  const _ServerLogs({super.key});
+  const _ServerLogs();
 
   @override
   Widget build(BuildContext context) {
@@ -108,7 +108,7 @@ class _ServerLogs extends StatelessWidget {
 
 
 class _AboutDialog extends StatelessWidget {
-  const _AboutDialog({super.key});
+  const _AboutDialog();
 
   @override
   Widget build(BuildContext context) {
@@ -145,7 +145,7 @@ class _AboutDialog extends StatelessWidget {
 }
 
 class _PreferencesDialog extends ConsumerWidget {
-  const _PreferencesDialog({super.key});
+  const _PreferencesDialog();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
