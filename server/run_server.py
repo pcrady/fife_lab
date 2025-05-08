@@ -70,7 +70,7 @@ def socket_server():
         try:
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         except AttributeError:
-            pass  
+            pass
 
         s.bind((HOST, PORT))
         s.listen()
@@ -117,8 +117,8 @@ def main() -> None:
     start_gunicorn()
 
     try:
-        socket_server()
         threading.Thread(target=reader, daemon=True).start()
+        threading.Thread(target=socket_server, daemon=True).start()
         while server_process and server_process.poll() is None:
             time.sleep(1)
     except KeyboardInterrupt:

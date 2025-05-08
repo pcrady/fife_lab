@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
+import 'package:dio/dio.dart';
+import 'package:fife_lab/constants.dart';
 import 'package:fife_lab/lib/app_logger.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
@@ -72,8 +74,18 @@ class ServerProcess {
     AppLogger.i(data.replaceFirst('\n', ''));
   }
 
-  static bool _checkIfAddressInUse(String data) {
-    return data.contains('address already in use') ? true : false;
+  static Future<bool> _serverIsUp() async {
+    try {
+      final dio = Dio(BaseOptions(baseUrl: kServer));
+      final response = await dio.get('/heartbeat');
+      if (response.data['status'] == 'alive') {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (_) {
+      return false;
+    }
   }
 
   static void _isolate(SendPort port) async {
@@ -88,31 +100,27 @@ class ServerProcess {
           infoColor: AnsiColor.fg(083),
         );
 
-        const retryDelay = Duration(milliseconds: 500);
-
         while (true) {
+          if (await _serverIsUp()) {
+            AppLogger.w('Server is already running. Cancelling process.');
+            break;
+          }
+
           final process = await Process.start(
             args.serverExecutable.path,
             args.serverArgs,
           );
 
-          bool addressInUse = false;
           final streams = [process.stdout, process.stderr];
           for (final stream in streams) {
             stream.transform(utf8.decoder).listen((data) {
               _annotateData(data);
-              addressInUse = _checkIfAddressInUse(data);
             });
           }
 
           final exitCode = await process.exitCode;
-          if (!addressInUse) {
-            port.send(exitCode);
-            break;
-          } else {
-            AppLogger.i('Retrying server start...');
-            await Future.delayed(retryDelay);
-          }
+          port.send(exitCode);
+          break;
         }
       }
     });

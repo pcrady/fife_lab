@@ -19,6 +19,11 @@ async def shutdown():
     return JSONResponse(content={"status": "shutting down..."})
 
 
+@router.get('/heartbeat')
+async def heartbeat():
+    return JSONResponse(content={'status': 'alive'})
+
+
 @router.post("/config")
 async def set_config(config: Config):
     try:

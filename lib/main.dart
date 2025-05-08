@@ -146,7 +146,6 @@ class _EagerInitializationState extends ConsumerState<_EagerInitialization> {
             '/config',
             data: {'project_path': settingsModel.projectPath},
           );
-          AppLogger.f(response.toString());
         } catch (err, stack) {
           AppLogger.e(err, stackTrace: stack);
         }
