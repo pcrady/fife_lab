@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:fife_lab/lib/app_logger.dart';
+import 'package:fife_lab/providers/images.dart';
 import 'package:fife_lab/providers/settings.dart';
 import 'package:fife_lab/widgets/dropdown_buttons/app_bar_dropdown.dart';
 import 'package:file_picker/file_picker.dart';
@@ -45,11 +46,11 @@ class _FileDropdownState extends ConsumerState<FileDropdown> {
         break;
       case _Selection.addImages:
         {
-          FilePickerResult? result = await FilePicker.platform.pickFiles(
-            allowMultiple: true,
-            withData: false,
-          );
-          if (result == null) return;
+          try {
+            await ref.read(imagesProvider.notifier).addImages();
+          } catch (err, stack) {
+            AppLogger.e(err, stackTrace: stack);
+          }
         }
       case _Selection.exportProject:
         throw UnimplementedError();
