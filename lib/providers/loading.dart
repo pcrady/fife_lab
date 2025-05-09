@@ -27,4 +27,15 @@ class Loading extends _$Loading {
       loadingTotal: loadingTotal,
     );
   }
+
+  void setLoadingTotal({
+    required double loadingTotal,
+  }) {
+    state = state.copyWith(loadingTotal: loadingTotal);
+  }
+
+  void incrementLoadingValue() {
+    final previous = state.loadingValue ?? 0.0;
+    state = state.copyWith(loadingValue: previous + 1);
+  }
 }

@@ -23,6 +23,7 @@ class MainScreen extends ConsumerStatefulWidget {
 class _MainScreenState extends ConsumerState<MainScreen> {
   bool connectingToServer = true;
   bool loading = false;
+  double? value;
 
   @override
   void initState() {
@@ -55,8 +56,10 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     ref.listenManual(
       loadingProvider,
       (previous, next) {
-        AppLogger.f(next.loadingProgress);
-        setState(() => loading = next.loading);
+        setState(() {
+          loading = next.loading;
+          value = next.loadingProgress;
+        });
       },
       fireImmediately: true,
     );
@@ -69,6 +72,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     return _MainScreenContent(
       connectingToServer: connectingToServer,
       loading: loading,
+      value: value,
     );
   }
 }
@@ -76,10 +80,12 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 class _MainScreenContent extends ConsumerStatefulWidget {
   final bool connectingToServer;
   final bool loading;
+  final double? value;
 
   const _MainScreenContent({
     this.connectingToServer = false,
     this.loading = false,
+    this.value,
   });
 
   @override
@@ -179,7 +185,10 @@ class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
                   children: [
                     Text('Loading...'),
                     SizedBox(height: 8.0),
-                    SizedBox(width: 200, child: LinearProgressIndicator()),
+                    SizedBox(
+                      width: 200,
+                      child: LinearProgressIndicator(value: widget.value),
+                    ),
                   ],
                 ),
               ),

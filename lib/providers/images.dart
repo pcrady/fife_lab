@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:fife_lab/constants.dart';
+import 'package:fife_lab/lib/app_logger.dart';
 import 'package:fife_lab/models/image_model.dart';
 import 'package:fife_lab/providers/loading.dart';
 import 'package:file_picker/file_picker.dart';
@@ -15,6 +16,15 @@ class Images extends _$Images {
     return [];
   }
 
+  Future<void> uploadWrapper(List<String> chunk) async {
+    final dio = Dio(BaseOptions(baseUrl: kServer));
+    await dio.post(
+      '/upload-images',
+      data: jsonEncode(chunk),
+    );
+    ref.read(loadingProvider.notifier).incrementLoadingValue();
+  }
+
   Future<void> addImages() async {
     try {
       ref.read(loadingProvider.notifier).setLoadingTrue();
@@ -27,17 +37,13 @@ class Images extends _$Images {
       if (result == null) return;
 
       final filePaths = result.files.map((file) => file.path).whereType<String>().toList();
-      final dio = Dio(BaseOptions(baseUrl: kServer));
-      final filePathChunks = filePaths.slices(50);
+      final filePathChunks = filePaths.slices(10);
       List<Future> futures = [];
 
+      ref.read(loadingProvider.notifier).setLoadingTotal(loadingTotal: filePathChunks.length.toDouble());
+
       for (final chunk in filePathChunks) {
-        futures.add(
-          dio.post(
-            '/upload-images',
-            data: jsonEncode(chunk),
-          ),
-        );
+        futures.add(uploadWrapper(chunk));
       }
       await Future.wait(futures);
     } catch (_, __) {
