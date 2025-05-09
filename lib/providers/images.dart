@@ -27,7 +27,7 @@ class Images extends _$Images {
     final dio = Dio(BaseOptions(baseUrl: kServer));
 
     final response = await dio.post(
-      '/uploadimages',
+      '/upload-images',
       data: jsonEncode(filePaths),
     );
     AppLogger.f(response);

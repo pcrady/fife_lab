@@ -1,10 +1,11 @@
 from pathlib import Path
 from filelock import FileLock
-from typing import Final
+from typing import Final, List
 from tinydb import TinyDB, Query
 from tinydb.storages import JSONStorage
-from app.models import CONFIG_KEY, Config, IOTest
-from app.app_logging import stdout_print
+from app.models import CONFIG_KEY, Config
+from glob import glob
+from os.path import basename
 
 
 class ConfigDB:
@@ -59,47 +60,30 @@ class ProjectDB:
         db_path = ProjectDB.__get_db_path()
         if not db_path:
             return None
-
         __db_lock = FileLock(f"{db_path}.lock")
         return __db_lock
 
 
     @staticmethod
-    def set_test_value(value: int):
+    def set_images() -> None:
+        project_dir = ConfigDB.get_project_dir()
         db_path: Final = ProjectDB.__get_db_path()
         lockfile: Final = ProjectDB.__get_db_lockfile()
 
         if db_path is None or lockfile is None:
-            return
+            return None
 
         with lockfile:
             db = TinyDB(db_path, storage=JSONStorage)
-            stdout_print(db_path)
-            q = Query()
-            db.upsert({'key': 'value', 'value': value}, q.key == 'value')
+            image_names = [
+                basename(path) for path in glob(f"{project_dir}/images/*.png") if not basename(path).startswith("thumbnail_")
+            ]
+
+            items = [{'image_name': image_name} for image_name in image_names]
+            db.insert_multiple(items)
+
 
     @staticmethod
-    def io_test(io_test: IOTest):
-        db_path = ProjectDB.__get_db_path()
-        db_lock = ProjectDB.__get_db_lockfile()
-
-        if db_path is None or db_lock is None:
-            return
-
-        with db_lock:
-            db = TinyDB(db_path, storage=JSONStorage)
-            q = Query()
-            existing = db.search(q.key == io_test.key)
-            if not existing:
-                db.insert(io_test.model_dump())
-                return io_test.model_dump()
-            if len(existing) == 1:
-                item = IOTest(**existing[0])
-                item.value += io_test.value 
-                item.test_type = io_test.test_type
-
-                db.update(item.model_dump(), q.key == item.key)
-                return item.model_dump()
-            raise RuntimeError(f"Multiple records found for {io_test.key}")
- 
+    def get_images() -> List | None:
+        pass
 
