@@ -2,6 +2,7 @@ import 'package:fife_lab/functions/convex_hull/convex_hull.dart';
 import 'package:fife_lab/functions/fife_lab_function.dart';
 import 'package:fife_lab/functions/general/general.dart';
 import 'package:fife_lab/lib/app_logger.dart';
+import 'package:fife_lab/providers/loading.dart';
 import 'package:fife_lab/providers/watchers/project_watcher.dart';
 import 'package:fife_lab/providers/settings.dart';
 import 'package:fife_lab/providers/watchers/server_watcher.dart';
@@ -20,7 +21,8 @@ class MainScreen extends ConsumerStatefulWidget {
 }
 
 class _MainScreenState extends ConsumerState<MainScreen> {
-  bool locked = true;
+  bool connectingToServer = true;
+  bool loading = false;
 
   @override
   void initState() {
@@ -30,8 +32,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         final serverIsUp = await next;
         final shouldLock = !serverIsUp;
 
-        if (shouldLock != locked) {
-          setState(() => locked = shouldLock);
+        if (shouldLock != connectingToServer) {
+          setState(() => connectingToServer = shouldLock);
         }
       },
       fireImmediately: true,
@@ -43,9 +45,18 @@ class _MainScreenState extends ConsumerState<MainScreen> {
         final workerIsUp = await next;
         final shouldLock = !workerIsUp;
 
-        if (shouldLock != locked) {
-          setState(() => locked = shouldLock);
+        if (shouldLock != connectingToServer) {
+          setState(() => connectingToServer = shouldLock);
         }
+      },
+      fireImmediately: true,
+    );
+
+    ref.listenManual(
+      loadingProvider,
+      (previous, next) {
+        AppLogger.f(next.loadingProgress);
+        setState(() => loading = next.loading);
       },
       fireImmediately: true,
     );
@@ -55,15 +66,20 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return _MainScreenContent(locked: locked);
+    return _MainScreenContent(
+      connectingToServer: connectingToServer,
+      loading: loading,
+    );
   }
 }
 
 class _MainScreenContent extends ConsumerStatefulWidget {
-  final bool locked;
+  final bool connectingToServer;
+  final bool loading;
 
   const _MainScreenContent({
-    this.locked = false,
+    this.connectingToServer = false,
+    this.loading = false,
   });
 
   @override
@@ -91,9 +107,9 @@ class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
     return Stack(
       children: [
         Opacity(
-          opacity: widget.locked ? 0.5 : 1.0,
+          opacity: widget.connectingToServer | widget.loading ? 0.5 : 1.0,
           child: IgnorePointer(
-            ignoring: widget.locked,
+            ignoring: widget.connectingToServer | widget.loading,
             child: Scaffold(
               appBar: FifeLabAppBar(),
               body: switch (settingsModel?.function) {
@@ -136,7 +152,7 @@ class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
             ),
           ),
         ),
-        switch (widget.locked) {
+        switch (widget.connectingToServer) {
           true => Material(
               type: MaterialType.transparency,
               child: Container(
@@ -145,6 +161,23 @@ class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text('Connecting To Sever..'),
+                    SizedBox(height: 8.0),
+                    SizedBox(width: 200, child: LinearProgressIndicator()),
+                  ],
+                ),
+              ),
+            ),
+          false => Container(),
+        },
+        switch (widget.loading) {
+          true => Material(
+              type: MaterialType.transparency,
+              child: Container(
+                alignment: Alignment.center,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Loading...'),
                     SizedBox(height: 8.0),
                     SizedBox(width: 200, child: LinearProgressIndicator()),
                   ],

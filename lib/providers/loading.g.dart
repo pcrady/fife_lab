@@ -1,25 +1,25 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'images.dart';
+part of 'loading.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$imagesHash() => r'97d0c4de7994d4e5246aa68060afd1aa095b47d7';
+String _$loadingHash() => r'7837cd24a4d5b9bb009527061ea5c704e8ccfb23';
 
-/// See also [Images].
-@ProviderFor(Images)
-final imagesProvider =
-    AutoDisposeAsyncNotifierProvider<Images, List<ImageModel>>.internal(
-  Images.new,
-  name: r'imagesProvider',
+/// See also [Loading].
+@ProviderFor(Loading)
+final loadingProvider =
+    AutoDisposeNotifierProvider<Loading, LoadingModel>.internal(
+  Loading.new,
+  name: r'loadingProvider',
   debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$imagesHash,
+      const bool.fromEnvironment('dart.vm.product') ? null : _$loadingHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$Images = AutoDisposeAsyncNotifier<List<ImageModel>>;
+typedef _$Loading = AutoDisposeNotifier<LoadingModel>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

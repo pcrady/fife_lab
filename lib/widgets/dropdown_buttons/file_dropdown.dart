@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:fife_lab/lib/app_logger.dart';
 import 'package:fife_lab/providers/images.dart';
+import 'package:fife_lab/providers/loading.dart';
 import 'package:fife_lab/providers/settings.dart';
 import 'package:fife_lab/widgets/dropdown_buttons/app_bar_dropdown.dart';
 import 'package:file_picker/file_picker.dart';

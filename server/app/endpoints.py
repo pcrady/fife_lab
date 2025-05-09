@@ -38,7 +38,6 @@ async def set_config(config: Config) -> JSONResponse:
 @router.post("/upload-images")
 async def upload_images(image_paths: List[str]) -> JSONResponse:
     try:
-        stdout_print(image_paths)
         project_dir = ConfigDB.get_project_dir()
         
         if not project_dir:
@@ -48,7 +47,6 @@ async def upload_images(image_paths: List[str]) -> JSONResponse:
         images_dir.mkdir(exist_ok=True)
 
         for image_path in image_paths:
-            stdout_print(image_path)
             ImageUtils.convert_to_png(image_path, str(images_dir))
 
         ProjectDB.set_images()
