@@ -23,7 +23,8 @@ class MainScreen extends ConsumerStatefulWidget {
 class _MainScreenState extends ConsumerState<MainScreen> {
   bool connectingToServer = true;
   bool loading = false;
-  double? value;
+  double? loadingProgress;
+  String? loadingMessage;
 
   @override
   void initState() {
@@ -58,7 +59,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       (previous, next) {
         setState(() {
           loading = next.loading;
-          value = next.loadingProgress;
+          loadingProgress = next.loadingProgress;
+          loadingMessage = next.loadingMessage;
         });
       },
       fireImmediately: true,
@@ -69,53 +71,27 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return _MainScreenContent(
-      connectingToServer: connectingToServer,
-      loading: loading,
-      value: value,
-    );
-  }
-}
-
-class _MainScreenContent extends ConsumerStatefulWidget {
-  final bool connectingToServer;
-  final bool loading;
-  final double? value;
-
-  const _MainScreenContent({
-    this.connectingToServer = false,
-    this.loading = false,
-    this.value,
-  });
-
-  @override
-  ConsumerState createState() => __MainScreenContentState();
-}
-
-class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
-  @override
-  Widget build(BuildContext context) {
     final settingsModel = ref.watch(settingsProvider).when(
-          data: (data) => data,
-          error: (_, __) => null,
-          loading: () => null,
-        );
+      data: (data) => data,
+      error: (_, __) => null,
+      loading: () => null,
+    );
 
     final event = ref.watch(projectWatcherProvider).when(
-          data: (data) => data,
-          error: (err, stack) {
-            AppLogger.e(err, stackTrace: stack);
-            return null;
-          },
-          loading: () => null,
-        );
+      data: (data) => data,
+      error: (err, stack) {
+        AppLogger.e(err, stackTrace: stack);
+        return null;
+      },
+      loading: () => null,
+    );
 
     return Stack(
       children: [
         Opacity(
-          opacity: widget.connectingToServer | widget.loading ? 0.5 : 1.0,
+          opacity: connectingToServer | loading ? 0.5 : 1.0,
           child: IgnorePointer(
-            ignoring: widget.connectingToServer | widget.loading,
+            ignoring: connectingToServer | loading,
             child: Scaffold(
               appBar: FifeLabAppBar(),
               body: switch (settingsModel?.function) {
@@ -135,21 +111,21 @@ class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
                       switch (event) {
                         null => Container(),
                         ProjectStatus.healthy => Text(
-                            'Healthy',
-                            style: TextStyle(color: Colors.greenAccent),
-                          ),
+                          'Healthy',
+                          style: TextStyle(color: Colors.greenAccent),
+                        ),
                         ProjectStatus.noProjectSelected => Text(
-                            'No Project Selected',
-                            style: TextStyle(color: Colors.yellow),
-                          ),
+                          'No Project Selected',
+                          style: TextStyle(color: Colors.yellow),
+                        ),
                         ProjectStatus.projectsDirNotFound => Text(
-                            'Projects Directory Not Found',
-                            style: TextStyle(color: Colors.red),
-                          ),
+                          'Projects Directory Not Found',
+                          style: TextStyle(color: Colors.red),
+                        ),
                         ProjectStatus.projectNotFound => Text(
-                            'Project Not Found',
-                            style: TextStyle(color: Colors.red),
-                          ),
+                          'Project Not Found',
+                          style: TextStyle(color: Colors.red),
+                        ),
                       }
                     ],
                   ),
@@ -158,41 +134,41 @@ class __MainScreenContentState extends ConsumerState<_MainScreenContent> {
             ),
           ),
         ),
-        switch (widget.connectingToServer) {
+        switch (connectingToServer) {
           true => Material(
-              type: MaterialType.transparency,
-              child: Container(
-                alignment: Alignment.center,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Connecting To Sever..'),
-                    SizedBox(height: 8.0),
-                    SizedBox(width: 200, child: LinearProgressIndicator()),
-                  ],
-                ),
+            type: MaterialType.transparency,
+            child: Container(
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('Connecting To Sever..'),
+                  SizedBox(height: 8.0),
+                  SizedBox(width: 200, child: LinearProgressIndicator()),
+                ],
               ),
             ),
+          ),
           false => Container(),
         },
-        switch (widget.loading) {
+        switch (loading) {
           true => Material(
-              type: MaterialType.transparency,
-              child: Container(
-                alignment: Alignment.center,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Loading...'),
-                    SizedBox(height: 8.0),
-                    SizedBox(
-                      width: 200,
-                      child: LinearProgressIndicator(value: widget.value),
-                    ),
-                  ],
-                ),
+            type: MaterialType.transparency,
+            child: Container(
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(loadingMessage ?? 'Loading...'),
+                  SizedBox(height: 8.0),
+                  SizedBox(
+                    width: 200,
+                    child: LinearProgressIndicator(value: loadingProgress),
+                  ),
+                ],
               ),
             ),
+          ),
           false => Container(),
         },
       ],

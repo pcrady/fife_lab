@@ -26,8 +26,9 @@ class Images extends _$Images {
   }
 
   Future<void> addImages() async {
+    final loading = ref.read(loadingProvider.notifier);
     try {
-      ref.read(loadingProvider.notifier).setLoadingTrue();
+      loading.setLoadingTrue('Converting Images...');
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         allowMultiple: true,
         withData: false,
@@ -38,14 +39,44 @@ class Images extends _$Images {
 
       final filePaths = result.files.map((file) => file.path).whereType<String>().toList();
       final filePathChunks = filePaths.slices(10);
-      List<Future> futures = [];
 
-      ref.read(loadingProvider.notifier).setLoadingTotal(loadingTotal: filePathChunks.length.toDouble());
+      loading.setLoadingTotal(loadingTotal: filePathChunks.length.toDouble());
+      List<Future> futures = [];
 
       for (final chunk in filePathChunks) {
         futures.add(uploadWrapper(chunk));
       }
+
       await Future.wait(futures);
+    } catch (_, __) {
+      rethrow;
+    } finally {
+      loading.setLoadingFalse();
+    }
+
+    // TODO
+    Future<List<String>> checkImageIntegrity() async {
+      return [];
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+  Future<List<String>> checkForCorruptedImages() async {
+    try {
+      ref.read(loadingProvider.notifier).setLoadingTrue('Verifying Image Integrity...');
+      // TODO return list of invalid images
+      return [];
     } catch (_, __) {
       rethrow;
     } finally {

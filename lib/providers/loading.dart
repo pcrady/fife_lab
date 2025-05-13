@@ -10,11 +10,16 @@ class Loading extends _$Loading {
     return LoadingModel();
   }
 
-  void setLoadingTrue() => state = state.copyWith(loading: true);
+  void setLoadingTrue(String loadingMessage) => state = state.copyWith(
+        loading: true,
+        loadingMessage: loadingMessage,
+      );
+
   void setLoadingFalse() => state = state.copyWith(
         loading: false,
         loadingValue: null,
         loadingTotal: null,
+        loadingMessage: null,
       );
 
   void setLoadingValue({

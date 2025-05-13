@@ -18,6 +18,7 @@ mixin _$LoadingModel {
   bool get loading;
   double? get loadingValue;
   double? get loadingTotal;
+  String? get loadingMessage;
 
   /// Create a copy of LoadingModel
   /// with the given fields replaced by the non-null parameter values.
@@ -39,17 +40,19 @@ mixin _$LoadingModel {
             (identical(other.loadingValue, loadingValue) ||
                 other.loadingValue == loadingValue) &&
             (identical(other.loadingTotal, loadingTotal) ||
-                other.loadingTotal == loadingTotal));
+                other.loadingTotal == loadingTotal) &&
+            (identical(other.loadingMessage, loadingMessage) ||
+                other.loadingMessage == loadingMessage));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, loading, loadingValue, loadingTotal);
+  int get hashCode => Object.hash(
+      runtimeType, loading, loadingValue, loadingTotal, loadingMessage);
 
   @override
   String toString() {
-    return 'LoadingModel(loading: $loading, loadingValue: $loadingValue, loadingTotal: $loadingTotal)';
+    return 'LoadingModel(loading: $loading, loadingValue: $loadingValue, loadingTotal: $loadingTotal, loadingMessage: $loadingMessage)';
   }
 }
 
@@ -59,7 +62,11 @@ abstract mixin class $LoadingModelCopyWith<$Res> {
           LoadingModel value, $Res Function(LoadingModel) _then) =
       _$LoadingModelCopyWithImpl;
   @useResult
-  $Res call({bool loading, double? loadingValue, double? loadingTotal});
+  $Res call(
+      {bool loading,
+      double? loadingValue,
+      double? loadingTotal,
+      String? loadingMessage});
 }
 
 /// @nodoc
@@ -77,6 +84,7 @@ class _$LoadingModelCopyWithImpl<$Res> implements $LoadingModelCopyWith<$Res> {
     Object? loading = null,
     Object? loadingValue = freezed,
     Object? loadingTotal = freezed,
+    Object? loadingMessage = freezed,
   }) {
     return _then(_self.copyWith(
       loading: null == loading
@@ -91,6 +99,10 @@ class _$LoadingModelCopyWithImpl<$Res> implements $LoadingModelCopyWith<$Res> {
           ? _self.loadingTotal
           : loadingTotal // ignore: cast_nullable_to_non_nullable
               as double?,
+      loadingMessage: freezed == loadingMessage
+          ? _self.loadingMessage
+          : loadingMessage // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -101,7 +113,10 @@ class _$LoadingModelCopyWithImpl<$Res> implements $LoadingModelCopyWith<$Res> {
     fieldRename: FieldRename.snake, explicitToJson: true, includeIfNull: false)
 class _LoadingModel extends LoadingModel {
   const _LoadingModel(
-      {this.loading = false, this.loadingValue, this.loadingTotal})
+      {this.loading = false,
+      this.loadingValue,
+      this.loadingTotal,
+      this.loadingMessage})
       : super._();
   factory _LoadingModel.fromJson(Map<String, dynamic> json) =>
       _$LoadingModelFromJson(json);
@@ -113,6 +128,8 @@ class _LoadingModel extends LoadingModel {
   final double? loadingValue;
   @override
   final double? loadingTotal;
+  @override
+  final String? loadingMessage;
 
   /// Create a copy of LoadingModel
   /// with the given fields replaced by the non-null parameter values.
@@ -138,17 +155,19 @@ class _LoadingModel extends LoadingModel {
             (identical(other.loadingValue, loadingValue) ||
                 other.loadingValue == loadingValue) &&
             (identical(other.loadingTotal, loadingTotal) ||
-                other.loadingTotal == loadingTotal));
+                other.loadingTotal == loadingTotal) &&
+            (identical(other.loadingMessage, loadingMessage) ||
+                other.loadingMessage == loadingMessage));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, loading, loadingValue, loadingTotal);
+  int get hashCode => Object.hash(
+      runtimeType, loading, loadingValue, loadingTotal, loadingMessage);
 
   @override
   String toString() {
-    return 'LoadingModel(loading: $loading, loadingValue: $loadingValue, loadingTotal: $loadingTotal)';
+    return 'LoadingModel(loading: $loading, loadingValue: $loadingValue, loadingTotal: $loadingTotal, loadingMessage: $loadingMessage)';
   }
 }
 
@@ -160,7 +179,11 @@ abstract mixin class _$LoadingModelCopyWith<$Res>
       __$LoadingModelCopyWithImpl;
   @override
   @useResult
-  $Res call({bool loading, double? loadingValue, double? loadingTotal});
+  $Res call(
+      {bool loading,
+      double? loadingValue,
+      double? loadingTotal,
+      String? loadingMessage});
 }
 
 /// @nodoc
@@ -179,6 +202,7 @@ class __$LoadingModelCopyWithImpl<$Res>
     Object? loading = null,
     Object? loadingValue = freezed,
     Object? loadingTotal = freezed,
+    Object? loadingMessage = freezed,
   }) {
     return _then(_LoadingModel(
       loading: null == loading
@@ -193,6 +217,10 @@ class __$LoadingModelCopyWithImpl<$Res>
           ? _self.loadingTotal
           : loadingTotal // ignore: cast_nullable_to_non_nullable
               as double?,
+      loadingMessage: freezed == loadingMessage
+          ? _self.loadingMessage
+          : loadingMessage // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
