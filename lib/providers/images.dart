@@ -53,24 +53,7 @@ class Images extends _$Images {
     } finally {
       loading.setLoadingFalse();
     }
-
-    // TODO
-    Future<List<String>> checkImageIntegrity() async {
-      return [];
-    }
   }
-
-
-
-
-
-
-
-
-
-
-
-
 
   Future<List<String>> checkForCorruptedImages() async {
     try {
