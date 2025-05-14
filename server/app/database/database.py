@@ -3,7 +3,7 @@ from filelock import FileLock
 from typing import Final, List
 from tinydb import TinyDB, Query
 from tinydb.storages import JSONStorage
-from app.models import CONFIG_KEY, Config
+from app.models.models import CONFIG_KEY, Config
 from glob import glob
 from os.path import basename
 
@@ -33,7 +33,7 @@ class ConfigDB:
             return Config(**items[0])
         else:
             raise Exception("More than one config has been found in the database")
-   
+
 
     @staticmethod  
     def get_project_dir() -> Path | None:
@@ -42,6 +42,16 @@ class ConfigDB:
             return None
         else:
             return Path(config.project_path)
+
+
+    @staticmethod  
+    def get_images_dir() -> Path | None:
+        project_dir = ConfigDB.get_project_dir()
+        if not project_dir:
+            return None
+        else:
+            return Path(project_dir).joinpath('images')
+
 
 
 class ProjectDB:

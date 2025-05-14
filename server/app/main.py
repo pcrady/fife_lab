@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from app.app_logging import stdout_print
+from app.utils.app_logging import stdout_print
 
-from app.test_endpoints import router as test_router
-from app.endpoints import router as router
+from app.api.test_endpoints import router as test_router
+from app.api.endpoints import router as router
 
 
 @asynccontextmanager

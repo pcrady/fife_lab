@@ -21,7 +21,7 @@ def stdout_print(message: str) -> None:
     if 'heartbeat' not in message:
         logger.info(message) 
 
-def start_gunicorn() -> None:
+def start_uvicorn() -> None:
     HOST = "127.0.0.1"
     PORT = "8000"
     global server_process
@@ -45,7 +45,7 @@ def start_gunicorn() -> None:
     )
     stdout_print(f"MAIN pid: {os.getpid()} - Uvicorn started (pid={server_process.pid}) on {HOST}/{PORT}")
 
-def shutdown_gunicorn(timeout: int = 5) -> None:
+def shutdown_uvicorn(timeout: int = 5) -> None:
     global server_process
     if not server_process or server_process.poll() is not None:
         return
@@ -60,7 +60,7 @@ def socket_server():
     global connected
     HOST = '127.0.0.1'
     PORT = 8001
-    timer = threading.Timer(120, shutdown_gunicorn)
+    timer = threading.Timer(120, shutdown_uvicorn)
     timer.start()
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -95,7 +95,7 @@ def handle_client(conn, addr):
             if not data:
                 stdout_print(f"CONTROL_SERVER pid: {control_server_pid} - Connection closed by {addr}")
                 stdout_print(f"CONTROL_SERVER pid: {control_server_pid} - Terminating processes")
-                shutdown_gunicorn()
+                shutdown_uvicorn()
                 os.kill(control_server_pid, signal.SIGTERM)
                 break
             else:
@@ -114,7 +114,7 @@ def reader():
 
 
 def main() -> None:
-    start_gunicorn()
+    start_uvicorn()
 
     try:
         threading.Thread(target=reader, daemon=True).start()
@@ -123,10 +123,10 @@ def main() -> None:
             time.sleep(1)
     except KeyboardInterrupt:
         stdout_print(f"MAIN pid: {os.getpid()} - KeyboardInterrupt caught in wrapper")
-        shutdown_gunicorn()
+        shutdown_uvicorn()
     except SystemExit:
         stdout_print(f"MAIN pid: {os.getpid()} - SystemExit caught in wrapper")
-        shutdown_gunicorn()
+        shutdown_uvicorn()
 
 
 if __name__ == "__main__":

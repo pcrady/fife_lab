@@ -4,10 +4,10 @@ from fastapi.responses import JSONResponse
 from fastapi import APIRouter
 from typing import List
 from pathlib import Path
-from app.models import Config
-from app.database import ConfigDB, ProjectDB
-from app.app_logging import stdout_print
-from app.image_utils import ImageUtils
+from app.models.models import Config
+from app.database.database import ConfigDB, ProjectDB
+from app.utils.app_logging import stdout_print
+from app.utils.image_utils import ImageUtils
 
 
 router = APIRouter()
@@ -38,12 +38,11 @@ async def set_config(config: Config) -> JSONResponse:
 @router.post("/upload-images")
 async def upload_images(image_paths: List[str]) -> JSONResponse:
     try:
-        project_dir = ConfigDB.get_project_dir()
+        images_dir = ConfigDB.get_images_dir()
         
-        if not project_dir:
-            raise Exception('No project directory has been specified')
+        if not images_dir:
+            raise Exception('No images directory has been specified')
 
-        images_dir = Path(project_dir).joinpath('images')
         images_dir.mkdir(exist_ok=True)
 
         for image_path in image_paths:
@@ -57,6 +56,20 @@ async def upload_images(image_paths: List[str]) -> JSONResponse:
         return JSONResponse(status_code=500, content={"error": str(e)})
 
 
+def get_image_paths() -> List[Path]:
+    images_dir = ConfigDB.get_images_dir()
+
+    if not images_dir:
+        raise Exception('No images directory has been specified')
+
+    return [images_dir.joinpath(image) for image in os.listdir(images_dir) if image.endswith('png')]
+
+
+
+
+@router.get('/verify-images')
+async def verify_images():
+    return 'test'
 
 @router.get('/get-images')
 async def get_images(image_paths: List[str]) -> JSONResponse:

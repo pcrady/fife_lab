@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.models import IOTest
+from app.models.models import IOTest
 
 
 router = APIRouter()
