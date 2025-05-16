@@ -212,7 +212,8 @@ def test_get_image_paths(isolate_db):
     assert set(image_paths) == {(images_dir / "a.png"), (images_dir / "c.png")}
 
 
-
+# TODO test that set images only adds images to teh database that dont
+# alreaady exist and does not overwrite existing data that may already be there
 
 
  

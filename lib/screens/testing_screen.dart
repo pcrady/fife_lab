@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:fife_lab/constants.dart';
 import 'package:fife_lab/lib/app_logger.dart';
+import 'package:fife_lab/providers/images.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -52,6 +53,19 @@ class _TestingScreenState extends ConsumerState<TestingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final data = ref.watch(imagesProvider);
+    data.when(
+      data: (data) {
+        AppLogger.i(data);
+      },
+      error: (err, stack) {
+        AppLogger.e(err, stackTrace: stack);
+      },
+      loading: () {
+        AppLogger.w('loading images');
+      },
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text('TESTING'),

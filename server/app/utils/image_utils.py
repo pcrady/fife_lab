@@ -25,6 +25,7 @@ class ImageUtils:
             imwrite(file_path, scaled_image)
         except Exception as e:
             print(f"[Error] Failed to save scaled image '{image_name}': {e}")
+            raise
 
 
     @staticmethod
@@ -36,6 +37,7 @@ class ImageUtils:
             ImageUtils.save_scaled_image(image, location, 'thumbnail_' + image_name)
         except Exception as e:
             print(f"[Error] Failed to save BGR image '{image_name}': {e}")
+            raise
 
 
     @staticmethod
@@ -46,6 +48,7 @@ class ImageUtils:
             ImageUtils.save_scaled_image(image, location, 'thumbnail_' + image_name)
         except Exception as e:
             print(f"[Error] Failed to save RGB image '{image_name}': {e}")
+            raise
 
 
     @staticmethod
@@ -58,6 +61,7 @@ class ImageUtils:
             ImageUtils.save_rgb_image(image, output_folder, png_filename)
         except Exception as e:
             print(f"[Error] Failed to convert image '{filepath}' to PNG: {e}")
+            raise
 
 
     @staticmethod

@@ -6,7 +6,7 @@ part of 'loading.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$loadingHash() => r'2e34ce35e7b126c9953180ad0c18ec78e904c859';
+String _$loadingHash() => r'221637d31d81632fbb335641ab1089fd50885fb0';
 
 /// See also [Loading].
 @ProviderFor(Loading)

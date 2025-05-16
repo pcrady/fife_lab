@@ -16,6 +16,9 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ImageModel {
   String get imageName;
+  String get imagePath;
+  String get imageThumbnailName;
+  String get imageThumbnailPath;
 
   /// Create a copy of ImageModel
   /// with the given fields replaced by the non-null parameter values.
@@ -33,16 +36,23 @@ mixin _$ImageModel {
         (other.runtimeType == runtimeType &&
             other is ImageModel &&
             (identical(other.imageName, imageName) ||
-                other.imageName == imageName));
+                other.imageName == imageName) &&
+            (identical(other.imagePath, imagePath) ||
+                other.imagePath == imagePath) &&
+            (identical(other.imageThumbnailName, imageThumbnailName) ||
+                other.imageThumbnailName == imageThumbnailName) &&
+            (identical(other.imageThumbnailPath, imageThumbnailPath) ||
+                other.imageThumbnailPath == imageThumbnailPath));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, imageName);
+  int get hashCode => Object.hash(runtimeType, imageName, imagePath,
+      imageThumbnailName, imageThumbnailPath);
 
   @override
   String toString() {
-    return 'ImageModel(imageName: $imageName)';
+    return 'ImageModel(imageName: $imageName, imagePath: $imagePath, imageThumbnailName: $imageThumbnailName, imageThumbnailPath: $imageThumbnailPath)';
   }
 }
 
@@ -52,7 +62,11 @@ abstract mixin class $ImageModelCopyWith<$Res> {
           ImageModel value, $Res Function(ImageModel) _then) =
       _$ImageModelCopyWithImpl;
   @useResult
-  $Res call({String imageName});
+  $Res call(
+      {String imageName,
+      String imagePath,
+      String imageThumbnailName,
+      String imageThumbnailPath});
 }
 
 /// @nodoc
@@ -68,11 +82,26 @@ class _$ImageModelCopyWithImpl<$Res> implements $ImageModelCopyWith<$Res> {
   @override
   $Res call({
     Object? imageName = null,
+    Object? imagePath = null,
+    Object? imageThumbnailName = null,
+    Object? imageThumbnailPath = null,
   }) {
     return _then(_self.copyWith(
       imageName: null == imageName
           ? _self.imageName
           : imageName // ignore: cast_nullable_to_non_nullable
+              as String,
+      imagePath: null == imagePath
+          ? _self.imagePath
+          : imagePath // ignore: cast_nullable_to_non_nullable
+              as String,
+      imageThumbnailName: null == imageThumbnailName
+          ? _self.imageThumbnailName
+          : imageThumbnailName // ignore: cast_nullable_to_non_nullable
+              as String,
+      imageThumbnailPath: null == imageThumbnailPath
+          ? _self.imageThumbnailPath
+          : imageThumbnailPath // ignore: cast_nullable_to_non_nullable
               as String,
     ));
   }
@@ -83,12 +112,23 @@ class _$ImageModelCopyWithImpl<$Res> implements $ImageModelCopyWith<$Res> {
 @JsonSerializable(
     fieldRename: FieldRename.snake, explicitToJson: true, includeIfNull: false)
 class _ImageModel extends ImageModel {
-  const _ImageModel({required this.imageName}) : super._();
+  const _ImageModel(
+      {required this.imageName,
+      required this.imagePath,
+      required this.imageThumbnailName,
+      required this.imageThumbnailPath})
+      : super._();
   factory _ImageModel.fromJson(Map<String, dynamic> json) =>
       _$ImageModelFromJson(json);
 
   @override
   final String imageName;
+  @override
+  final String imagePath;
+  @override
+  final String imageThumbnailName;
+  @override
+  final String imageThumbnailPath;
 
   /// Create a copy of ImageModel
   /// with the given fields replaced by the non-null parameter values.
@@ -111,16 +151,23 @@ class _ImageModel extends ImageModel {
         (other.runtimeType == runtimeType &&
             other is _ImageModel &&
             (identical(other.imageName, imageName) ||
-                other.imageName == imageName));
+                other.imageName == imageName) &&
+            (identical(other.imagePath, imagePath) ||
+                other.imagePath == imagePath) &&
+            (identical(other.imageThumbnailName, imageThumbnailName) ||
+                other.imageThumbnailName == imageThumbnailName) &&
+            (identical(other.imageThumbnailPath, imageThumbnailPath) ||
+                other.imageThumbnailPath == imageThumbnailPath));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, imageName);
+  int get hashCode => Object.hash(runtimeType, imageName, imagePath,
+      imageThumbnailName, imageThumbnailPath);
 
   @override
   String toString() {
-    return 'ImageModel(imageName: $imageName)';
+    return 'ImageModel(imageName: $imageName, imagePath: $imagePath, imageThumbnailName: $imageThumbnailName, imageThumbnailPath: $imageThumbnailPath)';
   }
 }
 
@@ -132,7 +179,11 @@ abstract mixin class _$ImageModelCopyWith<$Res>
       __$ImageModelCopyWithImpl;
   @override
   @useResult
-  $Res call({String imageName});
+  $Res call(
+      {String imageName,
+      String imagePath,
+      String imageThumbnailName,
+      String imageThumbnailPath});
 }
 
 /// @nodoc
@@ -148,11 +199,26 @@ class __$ImageModelCopyWithImpl<$Res> implements _$ImageModelCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   $Res call({
     Object? imageName = null,
+    Object? imagePath = null,
+    Object? imageThumbnailName = null,
+    Object? imageThumbnailPath = null,
   }) {
     return _then(_ImageModel(
       imageName: null == imageName
           ? _self.imageName
           : imageName // ignore: cast_nullable_to_non_nullable
+              as String,
+      imagePath: null == imagePath
+          ? _self.imagePath
+          : imagePath // ignore: cast_nullable_to_non_nullable
+              as String,
+      imageThumbnailName: null == imageThumbnailName
+          ? _self.imageThumbnailName
+          : imageThumbnailName // ignore: cast_nullable_to_non_nullable
+              as String,
+      imageThumbnailPath: null == imageThumbnailPath
+          ? _self.imageThumbnailPath
+          : imageThumbnailPath // ignore: cast_nullable_to_non_nullable
               as String,
     ));
   }

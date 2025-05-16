@@ -5,7 +5,9 @@ from tinydb import TinyDB, Query
 from tinydb.storages import JSONStorage
 from app.models.models import CONFIG_KEY, IMAGE_KEY, AbstractImage, Config
 from glob import glob
-from os.path import basename
+from os.path import basename, join
+
+from app.utils.app_logging import stderr_print, stdout_print
 
 
 class ConfigDB:
@@ -79,28 +81,49 @@ class ProjectDB:
         db_lock = FileLock(f"{db_path}.lock")
         return db_lock
 
+    
+    @staticmethod
+    def _get_image_thumbnail_pairs(project_dir: str) -> list[tuple[str,str]]:
+        image_dir = join(project_dir, "images")
+        all_names = { basename(p) for p in glob(f"{image_dir}/*.png") }
+        pairs: list[tuple[str,str]] = []
+    
+        for name in sorted(all_names):
+            if name.startswith("thumbnail_"):
+                continue
+    
+            thumb = f"thumbnail_{name}"
+            if thumb not in all_names:
+                # do this because its possible that another worker has not finished writing a thumbnail.
+                # the missing data will be added by that worker
+                continue
+            pairs.append((name, thumb))
+    
+        return pairs
+
 
     @staticmethod
     def set_images() -> None:
         """
         Inserts the names of images that are inside the "images" directory
-        into the project database.
+        into the project database, but only if they’re not already present.
         """
         project_dir = ConfigDB.get_project_dir()
         db_path: Final = ProjectDB._get_db_path()
         lockfile: Final = ProjectDB._get_db_lockfile()
-
         if db_path is None or lockfile is None:
-            return None
+            return
 
         with lockfile:
             db = TinyDB(db_path, storage=JSONStorage)
-            image_names = [
-                basename(path) for path in glob(f"{project_dir}/images/*.png") if not basename(path).startswith("thumbnail_")
-            ]
+            ImageQ = Query()
 
-            items = [AbstractImage(image_name=image_name).model_dump() for image_name in image_names]
-            db.insert_multiple(items)
+            image_name_touples = ProjectDB._get_image_thumbnail_pairs(str(project_dir))
+
+            for name in image_name_touples:
+                # only insert if no existing record has this image_name
+                if not db.contains(ImageQ.image_name == name[0]):
+                    db.insert(AbstractImage(image_name=name[0], image_thumbnail_name=name[1]).model_dump())
 
 
     @staticmethod
@@ -110,8 +133,9 @@ class ProjectDB:
         """
         db_path: Final = ProjectDB._get_db_path()
         lockfile: Final = ProjectDB._get_db_lockfile()
-
-        if db_path is None or lockfile is None:
+        images_dir = ConfigDB.get_images_dir()
+ 
+        if db_path is None or lockfile is None or images_dir is None:
             return None
 
         with lockfile:
@@ -120,7 +144,13 @@ class ProjectDB:
             items = db.search(query.key == IMAGE_KEY)
         if not items:
             return None
-        images = [AbstractImage(**item) for item in items]
+
+        images = []
+        for item in items:
+            image = AbstractImage(**item) 
+            image.image_path = str(images_dir.joinpath(image.image_name))
+            image.image_thumbnail_path = str(images_dir.joinpath(image.image_thumbnail_name))
+            images.append(image)
         return images
  
 
