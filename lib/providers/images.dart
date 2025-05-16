@@ -45,7 +45,7 @@ class Images extends _$Images {
       if (result == null) return;
 
       final filePaths = result.files.map((file) => file.path).whereType<String>().toList();
-      final filePathChunks = filePaths.slices(50);
+      final filePathChunks = filePaths.slices(100);
 
       loading.setLoadingTotal(loadingTotal: filePathChunks.length.toDouble());
       List<Future> futures = [];
@@ -66,8 +66,8 @@ class Images extends _$Images {
   }
 
   // TODO verify the number of images sent over matches the number added to the database.
-  // also verify the integrity of the converted images and make a visual alert if an images is corrupted
-  // or does not convert for some reason.
+  // TODO also verify the integrity of the converted images and make a visual alert if an images is corrupted
+  // TODO or does not convert for some reason.
 
   Future<List<String>> _checkForCorruptedImages() async {
     try {

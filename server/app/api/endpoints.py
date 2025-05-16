@@ -1,6 +1,7 @@
 import os
 import signal
 from fastapi.responses import JSONResponse
+import asyncio
 from fastapi import APIRouter
 from typing import List
 from app.models.models import Config
@@ -46,15 +47,21 @@ async def add_images(image_paths: List[str]) -> JSONResponse:
         stderr_print(e)
         return JSONResponse(status_code=500, content={"error": str(e)})
 
+    # Kick off all the convert_to_png calls on the default ThreadPool
+    tasks = [
+        asyncio.to_thread(ImageUtils.convert_to_png, src, str(images_dir))
+        for src in image_paths
+    ]
+
+    # Wait for them all, collecting exceptions rather than letting one blow up the entire batch
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+
     images_added = 0
-    for image_path in image_paths:
-        try:
-            # TODO see if can parallelize this
-            ImageUtils.convert_to_png(image_path, str(images_dir))
+    for src, res in zip(image_paths, results):
+        if isinstance(res, Exception):
+            stderr_print(f"failed to convert {src!r}: {res}")
+        else:
             images_added += 1
-        except Exception as e:
-            stderr_print(e)
-            continue
 
     try: 
         ProjectDB.set_images()

@@ -81,49 +81,52 @@ class ProjectDB:
         db_lock = FileLock(f"{db_path}.lock")
         return db_lock
 
-    
-    @staticmethod
-    def _get_image_thumbnail_pairs(project_dir: str) -> list[tuple[str,str]]:
-        image_dir = join(project_dir, "images")
-        all_names = { basename(p) for p in glob(f"{image_dir}/*.png") }
-        pairs: list[tuple[str,str]] = []
-    
-        for name in sorted(all_names):
-            if name.startswith("thumbnail_"):
-                continue
-    
-            thumb = f"thumbnail_{name}"
-            if thumb not in all_names:
-                # do this because its possible that another worker has not finished writing a thumbnail.
-                # the missing data will be added by that worker
-                continue
-            pairs.append((name, thumb))
-    
-        return pairs
 
+    @staticmethod
+    def _get_image_thumbnail_pairs(project_dir: str) -> list[tuple[str, str]]:
+        image_dir = Path(project_dir) / "images"
+        all_pngs = [p.name for p in image_dir.iterdir() if p.is_file() and p.suffix.lower() == ".png"]
+
+        thumbs = {name[len("thumbnail_"):]
+                  for name in all_pngs
+                  if name.startswith("thumbnail_")}
+
+        return [
+            (name, f"thumbnail_{name}")
+            for name in all_pngs
+            if not name.startswith("thumbnail_") and name in thumbs
+        ]
 
     @staticmethod
     def set_images() -> None:
         """
-        Inserts the names of images that are inside the "images" directory
-        into the project database, but only if they’re not already present.
+        Inserts any new images from the "images" dir into the project DB,
+        skipping ones already present.
         """
         project_dir = ConfigDB.get_project_dir()
-        db_path: Final = ProjectDB._get_db_path()
-        lockfile: Final = ProjectDB._get_db_lockfile()
+        db_path = ProjectDB._get_db_path()
+        lockfile = ProjectDB._get_db_lockfile()
         if db_path is None or lockfile is None:
             return
 
+        pairs = ProjectDB._get_image_thumbnail_pairs(str(project_dir))
+        if not pairs:
+            return  # no work
+
         with lockfile:
             db = TinyDB(db_path, storage=JSONStorage)
-            ImageQ = Query()
+            existing = {r["image_name"] for r in db.all()}
 
-            image_name_touples = ProjectDB._get_image_thumbnail_pairs(str(project_dir))
+            to_insert = []
+            for name, thumb in pairs:
+                if name not in existing:
+                    to_insert.append({
+                        "image_name": name,
+                        "image_thumbnail_name": thumb,
+                    })
 
-            for name in image_name_touples:
-                # only insert if no existing record has this image_name
-                if not db.contains(ImageQ.image_name == name[0]):
-                    db.insert(AbstractImage(image_name=name[0], image_thumbnail_name=name[1]).model_dump())
+            if to_insert:
+                db.insert_multiple(to_insert)   
 
 
     @staticmethod
