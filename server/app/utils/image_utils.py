@@ -3,7 +3,6 @@ from cv2 import imwrite, imread, resize, cvtColor, COLOR_RGB2BGR, INTER_AREA, IM
 import os
 from typing import Annotated, Literal, TypeVar
 import numpy.typing as npt
-from app.database.database import ConfigDB
 from pathlib import Path
 from typing import List
 from PIL import Image
