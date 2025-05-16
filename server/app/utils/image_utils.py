@@ -3,7 +3,10 @@ from cv2 import imwrite, imread, resize, cvtColor, COLOR_RGB2BGR, INTER_AREA, IM
 import os
 from typing import Annotated, Literal, TypeVar
 import numpy.typing as npt
-
+from app.database.database import ConfigDB
+from pathlib import Path
+from typing import List
+from PIL import Image
 
 DType = TypeVar("DType", bound=np.generic)
 
@@ -53,4 +56,42 @@ class ImageUtils:
             ImageUtils.save_rgb_image(image, output_folder, png_filename)
         except Exception as e:
             print(f"[Error] Failed to convert image '{filepath}' to PNG: {e}")
+
+    @staticmethod
+    def get_image_paths() -> List[Path]:
+        images_dir = ConfigDB.get_images_dir()
+        print('000000000000000000000000000000000000000000000000000000000000000')
+        print(images_dir)
+        print('000000000000000000000000000000000000000000000000000000000000000')
+ 
+        if not images_dir:
+            raise Exception('No images directory has been specified')
+
+        return [images_dir.joinpath(image) for image in os.listdir(images_dir) if image.endswith('png')]
+
+    @staticmethod
+    def verify_image(image_path: Path):
+        try:
+            with Image.open(image_path) as img:
+                img.verify()
+                return True
+        except (IOError, SyntaxError):
+            return False
+
+    @staticmethod
+    def check_for_corrupted_images() -> List[str]:
+        image_paths = ImageUtils.get_image_paths()
+
+        corrupted_images = []
+        for path in image_paths:
+            valid = ImageUtils.verify_image(path)
+
+            if not valid:
+                corrupted_images.append(path.name)
+
+        return corrupted_images
+        
+
+
+
 

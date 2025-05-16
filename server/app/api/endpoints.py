@@ -3,7 +3,6 @@ import signal
 from fastapi.responses import JSONResponse
 from fastapi import APIRouter
 from typing import List
-from pathlib import Path
 from app.models.models import Config
 from app.database.database import ConfigDB, ProjectDB
 from app.utils.app_logging import stdout_print
@@ -39,7 +38,6 @@ async def set_config(config: Config) -> JSONResponse:
 async def upload_images(image_paths: List[str]) -> JSONResponse:
     try:
         images_dir = ConfigDB.get_images_dir()
-        
         if not images_dir:
             raise Exception('No images directory has been specified')
 
@@ -56,24 +54,16 @@ async def upload_images(image_paths: List[str]) -> JSONResponse:
         return JSONResponse(status_code=500, content={"error": str(e)})
 
 
-def get_image_paths() -> List[Path]:
-    images_dir = ConfigDB.get_images_dir()
-
-    if not images_dir:
-        raise Exception('No images directory has been specified')
-
-    return [images_dir.joinpath(image) for image in os.listdir(images_dir) if image.endswith('png')]
-
-
-
-
 @router.get('/verify-images')
 async def verify_images():
-    return 'test'
+    corrupted_images = ImageUtils.check_for_corrupted_images()
+    return  JSONResponse(status_code=201, content=corrupted_images)
+
 
 @router.get('/get-images')
 async def get_images(image_paths: List[str]) -> JSONResponse:
     pass
+
 
 @router.post('/remove-images')
 async def remove_images(image_paths: List[str]) -> JSONResponse:
