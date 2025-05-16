@@ -27,6 +27,7 @@ class ImageUtils:
         except Exception as e:
             print(f"[Error] Failed to save scaled image '{image_name}': {e}")
 
+
     @staticmethod
     def save_bgr_image(image: ColorImage, location: str, image_name: str):
         try:
@@ -37,6 +38,7 @@ class ImageUtils:
         except Exception as e:
             print(f"[Error] Failed to save BGR image '{image_name}': {e}")
 
+
     @staticmethod
     def save_rgb_image(image: ColorImage, location: str, image_name: str):
         try:
@@ -45,6 +47,7 @@ class ImageUtils:
             ImageUtils.save_scaled_image(image, location, 'thumbnail_' + image_name)
         except Exception as e:
             print(f"[Error] Failed to save RGB image '{image_name}': {e}")
+
 
     @staticmethod
     def convert_to_png(filepath: str, output_folder: str):
@@ -57,17 +60,6 @@ class ImageUtils:
         except Exception as e:
             print(f"[Error] Failed to convert image '{filepath}' to PNG: {e}")
 
-    @staticmethod
-    def get_image_paths() -> List[Path]:
-        images_dir = ConfigDB.get_images_dir()
-        print('000000000000000000000000000000000000000000000000000000000000000')
-        print(images_dir)
-        print('000000000000000000000000000000000000000000000000000000000000000')
- 
-        if not images_dir:
-            raise Exception('No images directory has been specified')
-
-        return [images_dir.joinpath(image) for image in os.listdir(images_dir) if image.endswith('png')]
 
     @staticmethod
     def verify_image(image_path: Path):
@@ -78,10 +70,9 @@ class ImageUtils:
         except (IOError, SyntaxError):
             return False
 
-    @staticmethod
-    def check_for_corrupted_images() -> List[str]:
-        image_paths = ImageUtils.get_image_paths()
 
+    @staticmethod
+    def check_for_corrupted_images(image_paths: List[Path]) -> List[str]:
         corrupted_images = []
         for path in image_paths:
             valid = ImageUtils.verify_image(path)
@@ -90,8 +81,4 @@ class ImageUtils:
                 corrupted_images.append(path.name)
 
         return corrupted_images
-        
-
-
-
 
