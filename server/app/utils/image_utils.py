@@ -63,6 +63,9 @@ class ImageUtils:
 
     @staticmethod
     def verify_image(image_path: Path):
+        """
+        Verify that the image is not corrupted
+        """
         try:
             with Image.open(image_path) as img:
                 img.verify()
@@ -72,7 +75,10 @@ class ImageUtils:
 
 
     @staticmethod
-    def check_for_corrupted_images(image_paths: List[Path]) -> List[str]:
+    def verify_images(image_paths: List[Path]) -> List[str]:
+        """
+        Verify lists of images are not corrupted
+        """
         corrupted_images = []
         for path in image_paths:
             valid = ImageUtils.verify_image(path)
