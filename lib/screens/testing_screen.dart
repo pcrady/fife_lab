@@ -56,7 +56,7 @@ class _TestingScreenState extends ConsumerState<TestingScreen> {
     final data = ref.watch(imagesProvider);
     data.when(
       data: (data) {
-        AppLogger.i(data);
+        AppLogger.i(data.first);
       },
       error: (err, stack) {
         AppLogger.e(err, stackTrace: stack);
@@ -93,6 +93,18 @@ class _TestingScreenState extends ConsumerState<TestingScreen> {
               child: ElevatedButton(
                 onPressed: _getAll,
                 child: Text('All'),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  AppLogger.i('here');
+                  num? fuck = null;
+                  final what = 1 / fuck!;
+                  AppLogger.i('here2');
+                },
+                child: Text('DART ERROR'),
               ),
             ),
           ],

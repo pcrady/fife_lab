@@ -63,7 +63,7 @@ class ServerProcess {
     return args;
   }
 
-  static void _annotateData(String data) {
+  static void _annotateData(String data, SendPort port) {
     data = data.trim();
     data = data.replaceAll('\n', '');
     data = data.replaceAll('MAIN pid:', '\nMAIN pid:');
@@ -74,41 +74,42 @@ class ServerProcess {
   }
 
   static void _isolate(SendPort port) async {
-    final isolateReceivePort = ReceivePort();
-    port.send(isolateReceivePort.sendPort);
+        final isolateReceivePort = ReceivePort();
+        port.send(isolateReceivePort.sendPort);
 
-    isolateReceivePort.listen((dynamic args) async {
-      if (args is ServerProcessArgs) {
-        AppLogger.init(
-          logPath: args.logPath,
-          latestFileName: args.latestFileName,
-          infoColor: AnsiColor.fg(083),
-        );
+        isolateReceivePort.listen((dynamic args) async {
+          if (args is ServerProcessArgs) {
+            AppLogger.init(
+              logPath: args.logPath,
+              latestFileName: args.latestFileName,
+              infoColor: AnsiColor.fg(083),
+            );
 
-        while (true) {
-          if (await WorkerWatcher.workerIsUp()) {
-            AppLogger.w('Server is already running. Cancelling process.');
-            break;
+            while (true) {
+              if (await WorkerWatcher.workerIsUp()) {
+                AppLogger.i('Server is already running. Cancelling process.');
+                break;
+              }
+
+              final process = await Process.start(
+                args.serverExecutable.path,
+                args.serverArgs,
+              );
+
+              final streams = [process.stdout, process.stderr];
+              for (final stream in streams) {
+                stream.transform(utf8.decoder).listen((data) {
+                  _annotateData(data, port);
+                });
+              }
+
+              final exitCode = await process.exitCode;
+              port.send(exitCode);
+              break;
+            }
           }
+        });
 
-          final process = await Process.start(
-            args.serverExecutable.path,
-            args.serverArgs,
-          );
-
-          final streams = [process.stdout, process.stderr];
-          for (final stream in streams) {
-            stream.transform(utf8.decoder).listen((data) {
-              _annotateData(data);
-            });
-          }
-
-          final exitCode = await process.exitCode;
-          port.send(exitCode);
-          break;
-        }
-      }
-    });
   }
 
   void _handleResponsesFromIsolate(dynamic message) async {
@@ -127,7 +128,28 @@ class ServerProcess {
   Future<void> spawn() async {
     final mainReceivePort = ReceivePort();
     mainReceivePort.listen(_handleResponsesFromIsolate);
-    await Isolate.spawn(_isolate, mainReceivePort.sendPort);
+
+    final errorPort = ReceivePort();
+    errorPort.listen((dynamic errorMessage) {
+      AppLogger.f(errorMessage);
+      final List data = errorMessage as List;
+      final error = data[0];
+      final stack = data[1];
+      AppLogger.e('ISOLATE ERROR:\n $error');
+      AppLogger.e('ISOLATE STACK:\n $stack');
+    });
+
+    final exitPort = ReceivePort();
+    exitPort.listen((_) {
+      AppLogger.i('Worker isolate exited');
+    });
+
+    await Isolate.spawn(
+      _isolate,
+      mainReceivePort.sendPort,
+      onError: errorPort.sendPort,
+      onExit: exitPort.sendPort,
+    );
   }
 
   // sends message to isolate
