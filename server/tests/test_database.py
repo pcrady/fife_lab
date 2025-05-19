@@ -126,12 +126,7 @@ def test_set_images_creates_empty_db_when_no_pngs(isolate_db):
 
     # images/ doesn't exist yet => returns None
     assert ProjectDB.set_images() is None
-
-    # now create empty images folder and try again
-    (project_dir / "images").mkdir()
-    # this time it will create project_db.json (but no entries)
-    ProjectDB.set_images()
-
+ 
     db = TinyDB(project_dir / "project_db.json", storage=JSONStorage)
     assert db.all() == []
     db.close()
@@ -148,8 +143,10 @@ def test_set_images_inserts_only_non_thumbnail_pngs(isolate_db):
 
     # create some dummy files
     (images / "a.png").write_text("x")
+    (images / "thumbnail_a.png").write_text("x")
     (images / "thumbnail_b.png").write_text("y")
     (images / "c.png").write_text("z")
+    (images / "thumbnail_c.png").write_text("z")
     (images / "d.tif").write_text("alpha")
 
     ConfigDB.set_project_config(Config(project_path=str(project_dir)))
@@ -180,8 +177,11 @@ def test_get_images(isolate_db):
 
     ConfigDB.set_project_config(Config(project_path=str(project_dir)))
     (images_dir / "a.png").write_text("x")
+    (images_dir / "thumbnail_a.png").write_text("x")
+
     (images_dir / "thumbnail_b.png").write_text("y")
     (images_dir / "c.png").write_text("z")
+    (images_dir / "thumbnail_c.png").write_text("z")
     (images_dir / "d.tif").write_text("alpha")
 
     ProjectDB.set_images()
@@ -198,17 +198,16 @@ def test_get_image_paths(isolate_db):
 
     ConfigDB.set_project_config(Config(project_path=str(project_dir)))
     (images_dir / "a.png").write_text("x")
+    (images_dir / "thumbnail_a.png").write_text("x")
     (images_dir / "thumbnail_b.png").write_text("y")
     (images_dir / "c.png").write_text("z")
+    (images_dir / "thumbnail_c.png").write_text("z")
     (images_dir / "d.tif").write_text("alpha")
     ProjectDB.set_images()
 
     image_paths = ProjectDB.get_image_paths()
 
     assert image_paths is not None
-    for thing in image_paths:
-        print(thing)
-
     assert set(image_paths) == {(images_dir / "a.png"), (images_dir / "c.png")}
 
 

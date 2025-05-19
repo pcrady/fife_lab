@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:fife_lab/constants.dart';
 import 'package:fife_lab/lib/app_logger.dart';
+import 'package:fife_lab/models/responses.dart';
 import 'package:fife_lab/models/image_model.dart';
 import 'package:fife_lab/providers/loading.dart';
 import 'package:fife_lab/providers/settings.dart';
@@ -54,9 +55,21 @@ class Images extends _$Images {
         futures.add(uploadWrapper(chunk));
       }
 
+      List<String> failedImages = [];
       final responses = await Future.wait(futures);
+
       for (final response in responses) {
-        AppLogger.i(response);
+        final addImagesResponse = AddImagesResponse.fromJson(response.data);
+        failedImages.addAll(addImagesResponse.failedImages);
+      }
+
+      if (failedImages.isNotEmpty) {
+        throw 'Failed to add: $failedImages';
+      }
+
+      final corruptedImages = await checkForCorruptedImages();
+      if (corruptedImages.isNotEmpty) {
+        throw 'Corrupted Images: $corruptedImages';
       }
     } catch (_, __) {
       rethrow;
@@ -65,15 +78,14 @@ class Images extends _$Images {
     }
   }
 
-  // TODO verify the number of images sent over matches the number added to the database.
   // TODO also verify the integrity of the converted images and make a visual alert if an images is corrupted
   // TODO or does not convert for some reason.
-
-  Future<List<String>> _checkForCorruptedImages() async {
+  Future<List<String>> checkForCorruptedImages() async {
     try {
       ref.read(loadingProvider.notifier).setLoadingTrue('Verifying Image Integrity...');
-      // TODO return list of invalid images
-      return [];
+      final dio = Dio(BaseOptions(baseUrl: kServer));
+      final response = await dio.get('/verify-images');
+      return List<String>.from(response.data);
     } catch (_, __) {
       rethrow;
     } finally {

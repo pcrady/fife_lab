@@ -46,13 +46,18 @@ class ConfigDB:
             return Path(config.project_path)
 
 
+    """
+    get images directory, create it if it doesnt exist
+    """
     @staticmethod  
     def get_images_dir() -> Path | None:
         project_dir = ConfigDB.get_project_dir()
         if not project_dir:
             return None
         else:
-            return Path(project_dir).joinpath('images')
+            images_dir = Path(project_dir).joinpath('images')
+            images_dir.mkdir(exist_ok=True)
+            return images_dir
 
 
 
@@ -82,9 +87,9 @@ class ProjectDB:
         return db_lock
 
 
+    # TODO have this return an actual AbstractImage
     @staticmethod
-    def _get_image_thumbnail_pairs(project_dir: str) -> list[tuple[str, str]]:
-        image_dir = Path(project_dir) / "images"
+    def _get_image_thumbnail_pairs(image_dir: Path) -> list[tuple[str, str]]:
         all_pngs = [p.name for p in image_dir.iterdir() if p.is_file() and p.suffix.lower() == ".png"]
 
         thumbs = {name[len("thumbnail_"):]
@@ -103,13 +108,14 @@ class ProjectDB:
         Inserts any new images from the "images" dir into the project DB,
         skipping ones already present.
         """
-        project_dir = ConfigDB.get_project_dir()
         db_path = ProjectDB._get_db_path()
         lockfile = ProjectDB._get_db_lockfile()
-        if db_path is None or lockfile is None:
+        image_dir = ConfigDB.get_images_dir()
+
+        if db_path is None or lockfile is None or image_dir is None:
             return
 
-        pairs = ProjectDB._get_image_thumbnail_pairs(str(project_dir))
+        pairs = ProjectDB._get_image_thumbnail_pairs(image_dir)
         if not pairs:
             return  # no work
 
@@ -123,6 +129,7 @@ class ProjectDB:
                     to_insert.append({
                         "image_name": name,
                         "image_thumbnail_name": thumb,
+                        "key": IMAGE_KEY,
                     })
 
             if to_insert:

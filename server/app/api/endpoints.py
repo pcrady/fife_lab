@@ -38,11 +38,10 @@ async def set_config(config: Config) -> JSONResponse:
 @router.post("/add-images")
 async def add_images(image_paths: List[str]) -> JSONResponse:
     try:
-        number_of_images_recieved = len(image_paths)
+        number_of_images_received = len(image_paths)
         images_dir = ConfigDB.get_images_dir()
         if not images_dir:
             raise Exception('No images directory has been specified')
-        images_dir.mkdir(exist_ok=True)
     except Exception as e:
         stderr_print(e)
         return JSONResponse(status_code=500, content={"error": str(e)})
@@ -57,8 +56,10 @@ async def add_images(image_paths: List[str]) -> JSONResponse:
     results = await asyncio.gather(*tasks, return_exceptions=True)
 
     images_added = 0
+    failed_images = []
     for src, res in zip(image_paths, results):
         if isinstance(res, Exception):
+            failed_images.append(src)
             stderr_print(f"failed to convert {src!r}: {res}")
         else:
             images_added += 1
@@ -66,8 +67,9 @@ async def add_images(image_paths: List[str]) -> JSONResponse:
     try: 
         ProjectDB.set_images()
         return JSONResponse(status_code=201, content={'status': 'images added',
-                                                      'images_recieved': number_of_images_recieved,
-                                                      'images_added': images_added})
+                                                      'images_received': number_of_images_received,
+                                                      'images_added': images_added,
+                                                      'failed_images': failed_images})
     except Exception as e:
         stderr_print(e)
         return JSONResponse(status_code=500, content={"error": str(e)})
