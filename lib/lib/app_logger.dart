@@ -25,7 +25,7 @@ class AppLogger {
           path: logPath,
           latestFileName: latestFileName,
           maxFileSizeKB: 512,
-          maxRotatedFilesCount: 10,
+          maxRotatedFilesCount: 100,
         ),
       ]),
     );
