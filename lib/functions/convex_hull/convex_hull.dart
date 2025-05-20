@@ -36,9 +36,8 @@ class _ConvexHullState extends ConsumerState<ConvexHull> {
           radius: const Radius.circular(20),
           child: GridView.builder(
             controller: scrollController,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 6,
-            ),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 6),
+            padding: EdgeInsets.all(8.0),
             itemCount: images.length,
             itemBuilder: (BuildContext context, int index) {
               return ImageThumbnailCard(

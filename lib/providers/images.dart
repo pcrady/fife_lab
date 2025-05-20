@@ -97,9 +97,13 @@ class Images extends _$Images {
     required List<ImageModel> images,
   }) async {
     try {
-      final dio = Dio(BaseOptions(baseUrl: kServer));
-      final imageData = images.map((e) => e.toJson()).toList();
-      await dio.post('/remove-images', data: imageData);
+      final dio = Dio(
+        BaseOptions(
+          baseUrl: kServer,
+          contentType: Headers.jsonContentType,
+        ),
+      );
+      await dio.post('/remove-images', data: images);
     } catch (err, stack) {
       AppLogger.e(err, stackTrace: stack);
       rethrow;

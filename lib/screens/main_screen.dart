@@ -94,14 +94,11 @@ class _MainScreenState extends ConsumerState<MainScreen> {
             ignoring: connectingToServer | loading,
             child: Scaffold(
               appBar: FifeLabAppBar(),
-              body: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: switch (settingsModel?.function) {
-                  null => Container(),
-                  FifeLabFunction.general => General(),
-                  FifeLabFunction.convexHull => ConvexHull(),
-                },
-              ),
+              body: switch (settingsModel?.function) {
+                null => Container(),
+                FifeLabFunction.general => General(),
+                FifeLabFunction.convexHull => ConvexHull(),
+              },
               bottomNavigationBar: Container(
                 color: Theme.of(context).appBarTheme.backgroundColor,
                 height: 40,

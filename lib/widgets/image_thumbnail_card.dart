@@ -26,14 +26,15 @@ class _ImageThumbnailCardState extends ConsumerState<ImageThumbnailCard> {
     return Padding(
       padding: const EdgeInsets.all(4.0),
       child: Container(
-        clipBehavior: Clip.antiAlias,
-        foregroundDecoration: BoxDecoration(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
           border: widget.image.selected ? Border.all(color: Colors.green, width: 2) : null,
-          borderRadius: const BorderRadius.all(Radius.circular(12)),
+          image: DecorationImage(
+            image: widget.image.imageThumbnail,
+            fit: BoxFit.cover,
+          ),
         ),
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(12)),
-        ),
+        clipBehavior: Clip.antiAlias,
         child: MouseRegion(
           cursor: SystemMouseCursors.click,
           onEnter: (_) {
@@ -43,6 +44,7 @@ class _ImageThumbnailCardState extends ConsumerState<ImageThumbnailCard> {
             setState(() => mouseHover = false);
           },
           child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTap: () async {
               final pressed = HardwareKeyboard.instance.logicalKeysPressed;
               final isShiftDown = pressed.any((k) => k == LogicalKeyboardKey.shiftLeft || k == LogicalKeyboardKey.shiftRight);
@@ -68,10 +70,6 @@ class _ImageThumbnailCardState extends ConsumerState<ImageThumbnailCard> {
             child: Stack(
               clipBehavior: Clip.antiAlias,
               children: [
-                Image(
-                  key: UniqueKey(),
-                  image: widget.image.imageThumbnail,
-                ),
                 mouseHover
                     ? Positioned(
                         right: 4.0,
