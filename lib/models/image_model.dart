@@ -18,6 +18,7 @@ abstract class ImageModel with _$ImageModel {
     required String imagePath,
     required String imageThumbnailName,
     required String imageThumbnailPath,
+    @Default(false) bool selected,
   }) = _ImageModel;
 
   FileImage get image => FileImage(File(imagePath));

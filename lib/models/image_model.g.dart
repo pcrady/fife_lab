@@ -11,6 +11,7 @@ _ImageModel _$ImageModelFromJson(Map<String, dynamic> json) => _ImageModel(
       imagePath: json['image_path'] as String,
       imageThumbnailName: json['image_thumbnail_name'] as String,
       imageThumbnailPath: json['image_thumbnail_path'] as String,
+      selected: json['selected'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$ImageModelToJson(_ImageModel instance) =>
@@ -19,4 +20,5 @@ Map<String, dynamic> _$ImageModelToJson(_ImageModel instance) =>
       'image_path': instance.imagePath,
       'image_thumbnail_name': instance.imageThumbnailName,
       'image_thumbnail_path': instance.imageThumbnailPath,
+      'selected': instance.selected,
     };

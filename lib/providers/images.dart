@@ -119,4 +119,29 @@ class Images extends _$Images {
       ref.invalidateSelf();
     }
   }
+
+  // TODO potentially problemnatic with the caching of the images
+  Future<void> selectImages({
+    required List<ImageModel> images,
+  }) async {
+    final oldImages = await future;
+    List<ImageModel> returnImages = [];
+    for (final oldImage in oldImages) {
+      if (images.contains(oldImage)) {
+        returnImages.add(oldImage.copyWith(selected: true));
+      } else {
+        returnImages.add(oldImage.copyWith(selected: false));
+      }
+    }
+    state = AsyncValue.data(returnImages);
+  }
+}
+
+@riverpod
+class SelectedImages extends _$SelectedImages {
+  @override
+  FutureOr<List<ImageModel>> build() async {
+    final images = await ref.watch(imagesProvider.future);
+    return images.where((image) => image.selected).toList();
+  }
 }
