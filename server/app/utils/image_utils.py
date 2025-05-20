@@ -1,11 +1,12 @@
 import numpy as np
-from cv2 import imwrite, imread, resize, cvtColor, COLOR_RGB2BGR, INTER_AREA, IMREAD_COLOR
+from cv2 import imreadmulti, imwrite, imread, resize, cvtColor, COLOR_RGB2BGR, INTER_AREA, IMREAD_COLOR, IMREAD_ANYCOLOR
 import os
 from typing import Annotated, Literal, TypeVar
 import numpy.typing as npt
 from pathlib import Path
 from typing import List
 from PIL import Image
+from app.utils.app_logging import stderr_print
 
 DType = TypeVar("DType", bound=np.generic)
 
@@ -24,7 +25,7 @@ class ImageUtils:
             file_path = os.path.join(location, image_name)
             imwrite(file_path, scaled_image)
         except Exception as e:
-            print(f"[Error] Failed to save scaled image '{image_name}': {e}")
+            stderr_print(f"[Error] Failed to save scaled image '{image_name}': {e}")
             raise
 
 
@@ -36,7 +37,7 @@ class ImageUtils:
             imwrite(file_path, image_bgr)
             ImageUtils.save_scaled_image(image, location, 'thumbnail_' + image_name)
         except Exception as e:
-            print(f"[Error] Failed to save BGR image '{image_name}': {e}")
+            stderr_print(f"[Error] Failed to save BGR image '{image_name}': {e}")
             raise
 
 
@@ -47,20 +48,35 @@ class ImageUtils:
             imwrite(file_path, image)
             ImageUtils.save_scaled_image(image, location, 'thumbnail_' + image_name)
         except Exception as e:
-            print(f"[Error] Failed to save RGB image '{image_name}': {e}")
+            stderr_print(f"[Error] Failed to save RGB image '{image_name}': {e}")
             raise
 
 
     @staticmethod
     def convert_to_png(filepath: str, output_folder: str):
         try:
-            image = imread(filepath, IMREAD_COLOR)
-            if image is None:
+            images = []
+            success, images = imreadmulti(
+                mats=images,
+                filename=filepath,
+                flags=IMREAD_ANYCOLOR)
+            if not success:
                 raise ValueError("Failed to read image; it may be corrupted or the path is invalid.")
-            png_filename = os.path.splitext(os.path.basename(filepath))[0] + '.png'
-            ImageUtils.save_rgb_image(image, output_folder, png_filename)
+
+            image_number = len(images)
+            base_name = os.path.basename(filepath)
+
+            if image_number == 1:
+                png_filename = os.path.splitext(base_name)[0] + '.png'
+                ImageUtils.save_rgb_image(images[0], output_folder, png_filename)
+            else: 
+                for i in range(image_number):
+                    png_filename = os.path.splitext(base_name)[0] + f"_00{i}.png"
+                    ImageUtils.save_rgb_image(images[i], output_folder, png_filename)
+ 
+
         except Exception as e:
-            print(f"[Error] Failed to convert image '{filepath}' to PNG: {e}")
+            stderr_print(f"[Error] Failed to convert image '{filepath}' to PNG: {e}")
             raise
 
 
