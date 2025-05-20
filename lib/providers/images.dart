@@ -107,4 +107,16 @@ class Images extends _$Images {
       ref.invalidateSelf();
     }
   }
+
+  Future<void> clearProject() async {
+    try {
+      final dio = Dio(BaseOptions(baseUrl: kServer));
+      await dio.post('/clear-project');
+    } catch (err, stack) {
+      AppLogger.e(err, stackTrace: stack);
+      rethrow;
+    } finally {
+      ref.invalidateSelf();
+    }
+  }
 }

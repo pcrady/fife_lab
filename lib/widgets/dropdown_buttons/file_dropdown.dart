@@ -7,12 +7,14 @@ import 'package:fife_lab/widgets/dropdown_buttons/app_bar_dropdown.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:path/path.dart' as path;
 
 enum _Selection {
   newProject('New Project'),
   openProject('Open Project'),
   addImages('Add Images'),
+  clearProject('Clear Project'),
   exportProject('Export Project');
 
   const _Selection(this.value);
@@ -52,6 +54,14 @@ class _FileDropdownState extends ConsumerState<FileDropdown> {
           } catch (err, stack) {
             AppLogger.e(err, stackTrace: stack);
           }
+        }
+      case _Selection.clearProject:
+        {
+          showDialog(
+            context: context,
+            builder: (_) => const _ClearProjectDialog(),
+          );
+          break;
         }
       case _Selection.exportProject:
         throw UnimplementedError();
@@ -313,6 +323,41 @@ class __OpenProjectDialogState extends ConsumerState<_OpenProjectDialog> {
             }
           },
           child: const Text('Open'),
+        ),
+      ],
+    );
+  }
+}
+
+class _ClearProjectDialog extends ConsumerWidget {
+  const _ClearProjectDialog({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return AlertDialog(
+      title: Text('Clear Project'),
+      content: SizedBox(
+        width: 400,
+        height: 45,
+        child: Text('WARNING: If you clear the project everything will be deleted permanently. Are you sure you want to continue?'),
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Close'),
+        ),
+        TextButton(
+          onPressed: () async {
+            try {
+              await ref.read(imagesProvider.notifier).clearProject();
+              if (context.mounted) {
+                context.pop();
+              }
+            } catch (err, stack) {
+              AppLogger.e(err, stackTrace: stack);
+            }
+          },
+          child: const Text('Clear'),
         ),
       ],
     );

@@ -122,9 +122,16 @@ async def remove_images(images: List[AbstractImage]) -> JSONResponse:
 
 
 
-@router.post('/remove-all-images')
+@router.post('/clear-project')
 async def remove_all_images() -> JSONResponse:
-    pass
+    try:
+        ProjectDB.delete_everyting()
+        return  JSONResponse(status_code=200, content={'status': 'project cleared'})
+
+    except Exception as e:
+        stderr_print(e)
+        return JSONResponse(status_code=500, content={"error": str(e)})
+
 
 
 

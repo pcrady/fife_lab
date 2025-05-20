@@ -204,6 +204,32 @@ class ProjectDB:
             if image.image_thumbnail_path is not None and exists(image.image_thumbnail_path):
                 remove(image.image_thumbnail_path)
 
+    @staticmethod
+    def delete_everyting() -> None:
+        db_path: Final = ProjectDB._get_db_path()
+        lockfile: Final = ProjectDB._get_db_lockfile()
+        images_dir = ConfigDB.get_images_dir()
+ 
+        if db_path is None or lockfile is None or images_dir is None:
+            return None
+
+        images = ProjectDB.get_images()
+
+        with lockfile:
+            db = TinyDB(db_path, storage=JSONStorage)
+            db.truncate()
+
+        if not images: 
+            return;
+ 
+        for image in images:
+            if image.image_path is not None and exists(image.image_path):
+                remove(image.image_path)
+            if image.image_thumbnail_path is not None and exists(image.image_thumbnail_path):
+                remove(image.image_thumbnail_path)
+
+
+
 
 
  
