@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 import asyncio
 from fastapi import APIRouter
 from typing import List
-from app.models.models import Config
+from app.models.models import AbstractImage, Config
 from app.database.database import ConfigDB, ProjectDB
 from app.utils.app_logging import stdout_print, stderr_print
 from app.utils.image_utils import ImageUtils
@@ -91,6 +91,7 @@ async def verify_images():
         return JSONResponse(status_code=500, content={"error": str(e)})
 
 
+
 @router.get('/get-all-images')
 async def get_all_images() -> JSONResponse:
     try:
@@ -109,8 +110,16 @@ async def get_all_images() -> JSONResponse:
 
 
 @router.post('/remove-images')
-async def remove_images(image_paths: List[str]) -> JSONResponse:
-    pass
+async def remove_images(images: List[AbstractImage]) -> JSONResponse:
+    try:
+        ProjectDB.delete_images(images)
+        return  JSONResponse(status_code=200, content={'status': 'images removed'})
+
+    except Exception as e:
+        stderr_print(e)
+        return JSONResponse(status_code=500, content={"error": str(e)})
+
+
 
 
 @router.post('/remove-all-images')

@@ -19,7 +19,7 @@ class Images extends _$Images {
     final dio = Dio(BaseOptions(baseUrl: kServer));
     final response = await dio.get('/get-all-images');
     List<dynamic> data = response.data;
-    final images = data.map((e) => ImageModel.fromJson(e)).toList();
+    final images = data.map((e) => ImageModel.fromJson(e)).toList()..sort((a, b) => a.imageName.compareTo(b.imageName));
     return images;
   }
 
@@ -75,21 +75,36 @@ class Images extends _$Images {
       rethrow;
     } finally {
       loading.setLoadingFalse();
+      ref.invalidateSelf();
     }
   }
 
-  // TODO also verify the integrity of the converted images and make a visual alert if an images is corrupted
-  // TODO or does not convert for some reason.
   Future<List<String>> checkForCorruptedImages() async {
     try {
       ref.read(loadingProvider.notifier).setLoadingTrue('Verifying Image Integrity...');
       final dio = Dio(BaseOptions(baseUrl: kServer));
       final response = await dio.get('/verify-images');
       return List<String>.from(response.data);
-    } catch (_, __) {
+    } catch (err, stack) {
+      AppLogger.e(err, stackTrace: stack);
       rethrow;
     } finally {
       ref.read(loadingProvider.notifier).setLoadingFalse();
+    }
+  }
+
+  Future<void> deleteImages({
+    required List<ImageModel> images,
+  }) async {
+    try {
+      final dio = Dio(BaseOptions(baseUrl: kServer));
+      final imageData = images.map((e) => e.toJson()).toList();
+      await dio.post('/remove-images', data: imageData);
+    } catch (err, stack) {
+      AppLogger.e(err, stackTrace: stack);
+      rethrow;
+    } finally {
+      ref.invalidateSelf();
     }
   }
 }

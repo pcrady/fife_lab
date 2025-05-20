@@ -4,8 +4,8 @@ from typing import Final, List
 from tinydb import TinyDB, Query
 from tinydb.storages import JSONStorage
 from app.models.models import CONFIG_KEY, IMAGE_KEY, AbstractImage, Config
-from glob import glob
-from os.path import basename, join
+from os.path import exists
+from os import remove
 
 from app.utils.app_logging import stderr_print, stdout_print
 
@@ -180,4 +180,30 @@ class ProjectDB:
 
         return [images_dir.joinpath(image.image_name) for image in images]
 
+    @staticmethod
+    def delete_images(images: List[AbstractImage]) -> None:
+        """
+        Delete lists of images from the database and remove them from the images directory
+        """
+        db_path: Final = ProjectDB._get_db_path()
+        lockfile: Final = ProjectDB._get_db_lockfile()
+        images_dir = ConfigDB.get_images_dir()
+ 
+        if db_path is None or lockfile is None or images_dir is None:
+            return None
 
+        with lockfile:
+            db = TinyDB(db_path, storage=JSONStorage)
+            query = Query()
+            image_names =[image.image_name for image in images]
+            db.remove(query.image_name.one_of(image_names))
+
+        for image in images:
+            if image.image_path is not None and exists(image.image_path):
+                remove(image.image_path)
+            if image.image_thumbnail_path is not None and exists(image.image_thumbnail_path):
+                remove(image.image_thumbnail_path)
+
+
+
+ 

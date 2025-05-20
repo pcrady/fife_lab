@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'image_model.freezed.dart';
@@ -16,6 +19,9 @@ abstract class ImageModel with _$ImageModel {
     required String imageThumbnailName,
     required String imageThumbnailPath,
   }) = _ImageModel;
+
+  FileImage get image => FileImage(File(imagePath));
+  FileImage get imageThumbnail => FileImage(File(imageThumbnailPath));
 
   factory ImageModel.fromJson(Map<String, dynamic> json) => _$ImageModelFromJson(json);
 }
