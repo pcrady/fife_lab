@@ -84,7 +84,11 @@ class _ImageThumbnailCardState extends ConsumerState<ImageThumbnailCard> {
                             try {
                               final selectedImages = await ref.read(selectedImagesProvider.future);
                               if (selectedImages.isNotEmpty) {
-                                await ref.read(imagesProvider.notifier).deleteImages(images: selectedImages);
+                                if (selectedImages.contains(widget.image)) {
+                                  await ref.read(imagesProvider.notifier).deleteImages(images: selectedImages);
+                                } else {
+                                  await ref.read(imagesProvider.notifier).deleteImages(images: [widget.image]);
+                                }
                               } else {
                                 await ref.read(imagesProvider.notifier).deleteImages(images: [widget.image]);
                               }
