@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:fife_lab/constants.dart';
 import 'package:fife_lab/lib/app_logger.dart';
 import 'package:fife_lab/models/image_model.dart';
 import 'package:fife_lab/providers/images.dart';
@@ -27,7 +28,7 @@ class _ImageThumbnailCardState extends ConsumerState<ImageThumbnailCard> {
       padding: const EdgeInsets.all(4.0),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(kImageBorderRadius),
           border: widget.image.selected ? Border.all(color: Colors.green, width: 2) : null,
           image: DecorationImage(
             image: widget.image.imageThumbnail,
@@ -112,6 +113,72 @@ class _ImageThumbnailCardState extends ConsumerState<ImageThumbnailCard> {
                 )
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ImageListTile extends ConsumerWidget {
+  final ImageModel image;
+
+  const ImageListTile({
+    required this.image,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () async {
+        final pressed = HardwareKeyboard.instance.logicalKeysPressed;
+        final isShiftDown = pressed.any((k) => k == LogicalKeyboardKey.shiftLeft || k == LogicalKeyboardKey.shiftRight);
+
+        if (isShiftDown) {
+          final selectedImages = await ref.read(selectedImagesProvider.future);
+
+          if (selectedImages.isEmpty) {
+            ref.read(imagesProvider.notifier).selectImages(images: [image]);
+          } else {
+            final allImages = await ref.read(imagesProvider.future);
+            final first = selectedImages.first;
+            final a = allImages.indexOf(first);
+            final b = allImages.indexOf(image);
+            final idx = [a, b]..sort();
+            final range = allImages.sublist(idx[0], idx[1] + 1);
+            ref.read(imagesProvider.notifier).selectImages(images: range);
+          }
+        } else {
+          ref.read(imagesProvider.notifier).selectImages(images: [image]);
+        }
+      },
+      child: Container(
+        color: Colors.transparent,
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(kImageBorderRadius),
+            side: image.selected ? BorderSide(color: Colors.green, width: 2.0) : BorderSide.none,
+          ),
+          color: Color(0xFF1e112b),
+          child: ListTile(
+            key: Key(image.imageName),
+            mouseCursor: SystemMouseCursors.click,
+            leading: ClipRRect(
+              borderRadius: BorderRadius.circular(kImageBorderRadius),
+              child: Image(
+                image: image.imageThumbnail,
+                width: 32, // ← take up all the parent’s width
+                fit: BoxFit.cover, // or BoxFit.fitWidth if you only care about width
+              ),
+            ),
+            title: Text(
+              image.imageName,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: Colors.white),
+            ),
+            dense: true,
           ),
         ),
       ),
