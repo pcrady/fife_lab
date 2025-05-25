@@ -35,20 +35,26 @@ class _SelectedImagesWidgetState extends ConsumerState<SelectedImagesWidget> {
         if (selectedImages.isEmpty) {
           return Container();
         } else {
-          return SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(
-                    right: 8.0,
-                    top: 8.0,
-                    bottom: 8.0,
+          return RawScrollbar(
+            thumbColor: Colors.white30,
+            controller: scrollController,
+            radius: const Radius.circular(20),
+            child: SingleChildScrollView(
+              controller: scrollController,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      right: 8.0,
+                      top: 8.0,
+                      bottom: 8.0,
+                    ),
+                    child: _SelectedImage(image: selectedImages[0]),
                   ),
-                  child: _SelectedImage(image: selectedImages[0]),
-                ),
-                Text(selectedImages[0].imageName),
-              ],
+                  Text(selectedImages[0].imageName),
+                ],
+              ),
             ),
           );
         }

@@ -1,7 +1,5 @@
 import 'package:fife_lab/functions/general/selected_images.dart';
-import 'package:fife_lab/providers/images.dart';
 import 'package:fife_lab/widgets/dynamic_image_list.dart';
-import 'package:fife_lab/widgets/image_thumbnail_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -16,11 +14,8 @@ class _GeneralState extends ConsumerState<General> {
   static const _maxSlidePosition = 200.0;
   double relativeDividerPosition = _maxSlidePosition;
 
-
   @override
   Widget build(BuildContext context) {
-    final imageData = ref.watch(imagesProvider);
-
     return LayoutBuilder(
       builder: (context, constraints) {
         return Row(
